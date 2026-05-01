@@ -1553,7 +1553,7 @@ function convertDataToExcel() {
   
   // Tasks section
   data.push(['TASKS']);
-  data.push(['ID', 'Title', 'Role', 'Project', 'Priority', 'Status', 'Due', 'Next Action', 'Estimate', 'Created']);
+  data.push(['ID', 'Title', 'Role', 'Project', 'Priority', 'Status', 'Due', 'Next Action', 'Estimate', 'Created', 'Notes']);
   S.tasks.forEach(task => {
     data.push([
       task.id || '',
@@ -1565,56 +1565,39 @@ function convertDataToExcel() {
       task.due || '',
       task.nextAction || '',
       task.est || '',
-      task.created || ''
+      task.created || '',
+      task.notes || ''
     ]);
   });
-  
+
   data.push([]);
-  
+
   // Projects section
   data.push(['PROJECTS']);
-  data.push(['ID', 'Name', 'Role', 'Archived']);
+  data.push(['ID', 'Name', 'Role', 'Desc', 'Archived', 'ArchivedAt']);
   S.projects.forEach(project => {
-    data.push([
-      project.id || '',
-      project.name || '',
-      project.role || '',
-      'false'
-    ]);
+    data.push([project.id||'', project.name||'', project.role||'', project.desc||'', 'false', '']);
   });
   (S.archivedProjects || []).forEach(project => {
-    data.push([
-      project.id || '',
-      project.name || '',
-      project.role || '',
-      'true'
-    ]);
+    data.push([project.id||'', project.name||'', project.role||'', project.desc||'', 'true', project.archivedAt||'']);
   });
-  
+
   data.push([]);
-  
+
   // Payments section
   data.push(['PAYMENTS']);
-  data.push(['Client', 'Amount', 'Due', 'Status']);
+  data.push(['ID', 'Client', 'Amount', 'Due', 'Status', 'Notes']);
   S.payments.forEach(payment => {
-    data.push([
-      payment.client || '',
-      payment.amount || '',
-      payment.due || '',
-      payment.status || ''
-    ]);
+    data.push([payment.id||uid(), payment.client||'', payment.amount||'', payment.due||'', payment.status||'', payment.notes||'']);
   });
-  
+
   data.push([]);
-  
+
   // Decisions section
   data.push(['DECISIONS']);
-  data.push(['Timestamp', 'Note']);
+  data.push(['ID', 'Timestamp', 'Note']);
   S.decisions.forEach(decision => {
-    data.push([
-      decision.ts || '',
-      decision.note || decision.text || decision
-    ]);
+    data.push([decision.id||uid(), decision.ts||'', decision.note||decision.text||'']);
   });
   
   data.push([]);
@@ -1681,39 +1664,46 @@ function parseExcelData(excelData) {
     // Parse section data
     if (section === 'tasks' && headers) {
       result.tasks.push({
-        id: row[0] || '',
-        title: row[1] || '',
-        role: row[2] || '',
-        project: row[3] || '',
-        priority: row[4] || '',
-        status: row[5] || '',
-        due: row[6] || '',
+        id:         row[0] || uid(),
+        title:      row[1] || '',
+        role:       row[2] || '',
+        project:    row[3] || '',
+        priority:   row[4] || 'medium',
+        status:     row[5] || 'pending',
+        due:        row[6] || '',
         nextAction: row[7] || '',
-        est: row[8] || '',
-        created: row[9] || ''
+        est:        row[8] || '',
+        created:    row[9] || '',
+        notes:      row[10] || ''
       });
     } else if (section === 'projects' && headers) {
       const project = {
-        id: row[0] || '',
+        id:   row[0] || uid(),
         name: row[1] || '',
-        role: row[2] || ''
+        role: row[2] || '',
+        desc: row[3] || ''
       };
-      if (row[3] === 'true') {
+      const isArchived = String(row[4]).toLowerCase() === 'true';
+      if (isArchived) {
+        project.archivedAt = row[5] || '';
         result.archivedProjects.push(project);
       } else {
         result.projects.push(project);
       }
     } else if (section === 'payments' && headers) {
       result.payments.push({
-        client: row[0] || '',
-        amount: row[1] || '',
-        due: row[2] || '',
-        status: row[3] || ''
+        id:     row[0] || uid(),
+        client: row[1] || '',
+        amount: row[2] || '',
+        due:    row[3] || '',
+        status: row[4] || 'pending',
+        notes:  row[5] || ''
       });
     } else if (section === 'decisions' && headers) {
       result.decisions.push({
-        ts: row[0] || '',
-        note: row[1] || ''
+        id:   row[0] || uid(),
+        ts:   row[1] || '',
+        note: row[2] || ''
       });
     } else if (section === 'metadata') {
       if (first === 'Revenue') {
@@ -2755,7 +2745,7 @@ document.getElementById('command-input').addEventListener('keydown', function(e)
   const v = this.value.trim(); if (!v) return;
   const p = parseCmd(v);
   if (p.title.length > 1) {
-    S.tasks.unshift({ id:uid(), title:p.title, nextAction:'Define next action', role:p.role, project:p.project, priority:p.priority, status:'pending', due:'', notes:'' });
+    S.tasks.unshift({ id:uid(), title:p.title, nextAction:'Define next action', role:p.role, project:p.project, priority:p.priority, status:'pending', due:'', notes:'', est:'', created:today() });
     save(); this.value=''; F.search=''; renderAll(); toast(`✓ ${p.title}`);
   }
 });
