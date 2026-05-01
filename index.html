@@ -122,9 +122,6 @@
   }
 
 
-  /* ============================
-     LANDING PAGE
-  ============================== */
   .header-actions { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
 
   .btn-icon {
@@ -1830,12 +1827,10 @@ function _writeToDisk(isManual) {
   // Layer 2 — IndexedDB (async, survives cache clears)
   _idbWrite({ data: payload, savedAt: now.toISOString() });
 
-  // Layer 3 — GitHub sync (if connected)
-  if (GITHUB_CONFIG.connected) {
-    writeDataToGitHub().catch(err => {
-      console.error('GitHub sync error:', err);
-    });
-  }
+  // Layer 3 — GitHub sync
+  writeDataToGitHub().catch(err => {
+    console.error('GitHub sync error:', err);
+  });
 
   _lastSavedAt = now;
   _flashSaveBtn();
@@ -1923,7 +1918,6 @@ function dispDate(ds) { if (!ds) return ''; return new Date(ds).toLocaleDateStri
 function isOverdue(t) { return t.status !== 'done' && t.due && daysUntil(t.due) < 0; }
 function isDueSoon(t) { if (t.status === 'done' || !t.due) return false; const d = daysUntil(t.due); return d >= 0 && d <= 2; }
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function rdot(r) { return ['CEO','COO','CFO','CMO','CIO'].includes(r) ? 'rd-'+r : 'rd-OTHER'; }
 
 function toast(msg) {
   const t = document.getElementById('toast');
@@ -2364,6 +2358,7 @@ function saveTask() {
   if (!title) { toast('⚠ Title required'); return; }
   if (!na)    { toast('⚠ Next Action required'); return; }
 
+  const existing = id ? S.tasks.find(t => t.id === id) : null;
   const task = {
     id: id||uid(), title, nextAction: na,
     role:     document.getElementById('task-role').value,
@@ -2372,6 +2367,8 @@ function saveTask() {
     status:   document.getElementById('task-status').value,
     due:      document.getElementById('task-due').value,
     notes:    document.getElementById('task-notes').value,
+    est:      existing?.est || '',
+    created:  existing?.created || new Date().toISOString().slice(0,10),
   };
 
   if (id) { const i = S.tasks.findIndex(t=>t.id===id); if (i>=0) S.tasks[i]=task; }
@@ -2585,10 +2582,6 @@ function setRoleColor(r, color) {
   S.roleColors[r] = color;
 }
 
-function rdot(r) {
-  const color = getRoleColor(r);
-  return `rd-CUSTOM" style="background:${color}`;
-}
 
 function openRoleModal() {
   resetRoleForm();
