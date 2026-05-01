@@ -146,23 +146,7 @@
   .btn-save svg { flex-shrink: 0; transition: transform 0.2s; }
   .btn-save:hover { background: var(--surface3); color: var(--text); border-color: var(--border2); }
   .btn-save:active { transform: scale(0.95); }
-  /* Unsaved state — pulses accent to draw attention */
-  .btn-save.unsaved {
-    background: rgba(79,140,255,0.12);
-    border-color: rgba(79,140,255,0.5);
-    color: var(--accent);
-    animation: saveBtnPulse 2s ease-in-out infinite;
-  }
-  .btn-save.unsaved svg { animation: saveBtnBob 2s ease-in-out infinite; }
-  @keyframes saveBtnPulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(79,140,255,0); }
-    50%      { box-shadow: 0 0 0 3px rgba(79,140,255,0.2); }
-  }
-  @keyframes saveBtnBob {
-    0%,100% { transform: translateY(0); }
-    50%      { transform: translateY(-1px); }
-  }
-  /* Saved flash */
+/* Saved flash */
   .btn-save.just-saved {
     background: rgba(34,197,94,0.12);
     border-color: rgba(34,197,94,0.4);
@@ -1793,10 +1777,8 @@ const IDB_NAME   = 'kneuralabs_cmd';
 const IDB_STORE  = 'snapshots';
 const IDB_KEY    = 'main';
 
-let _saveDebounceTimer = null;
-let _lastSavedAt       = null;
-let _hasUnsavedChanges = false;
-let _idb               = null;   // IndexedDB instance
+let _lastSavedAt = null;
+let _idb         = null;
 
 // ---- IndexedDB setup ----
 function _openIDB() {
@@ -1852,43 +1834,17 @@ function _writeToDisk(isManual) {
     });
   }
 
-  _lastSavedAt       = now;
-  _hasUnsavedChanges = false;
-  _updateSaveBtn();
-  _showSaved(now, isManual);
+  _lastSavedAt = now;
+  _flashSaveBtn();
 }
 
-// ---- Debounced autosave (triggered on every mutation) ----
-function save() {
-  _hasUnsavedChanges = true;
-  _updateSaveBtn();
-  _showSaving();
-  clearTimeout(_saveDebounceTimer);
-  _saveDebounceTimer = setTimeout(() => _writeToDisk(false), 600);
-}
+// No-op: mutations no longer auto-save; use the Save button
+function save() {}
 
 // ---- Manual save (Save button / Cmd+S) ----
 function manualSave() {
-  clearTimeout(_saveDebounceTimer);
   _writeToDisk(true);
 }
-
-// Periodic safety-save every 30 s
-setInterval(() => {
-  if (S.tasks.length || S.projects.length || S.payments.length || S.decisions.length) {
-    _writeToDisk(false);
-  }
-}, 30000);
-
-// Flush on tab close / navigation
-window.addEventListener('beforeunload', e => {
-  clearTimeout(_saveDebounceTimer);
-  _writeToDisk(false);
-  if (_hasUnsavedChanges) {
-    e.preventDefault();
-    e.returnValue = '';   // triggers browser "leave page?" dialog as a safety net
-  }
-});
 
 // ---- Load: localStorage first, then IDB fallback ----
 async function load() {
@@ -1938,30 +1894,10 @@ async function load() {
     ];
   }
 
-  _updateSaveBtn();
   if (_lastSavedAt) _flashSaveBtn();
 }
 
-function _showSaving() {}
-function _showSaved(date, isManual) { if (isManual) _flashSaveBtn(); }
 function _showError() { toast('Save failed'); }
-
-// ---- Save button state ----
-function _updateSaveBtn() {
-  const btn = document.getElementById('save-btn');
-  const lbl = document.getElementById('save-btn-label');
-  if (!btn) return;
-  if (_hasUnsavedChanges) {
-    btn.classList.add('unsaved');
-    btn.classList.remove('just-saved');
-    if (lbl) lbl.textContent = 'Save';
-    btn.title = 'Unsaved changes — click to save (Ctrl+S)';
-  } else {
-    btn.classList.remove('unsaved');
-    if (lbl) lbl.textContent = 'Saved';
-    btn.title = 'All changes saved (Ctrl+S)';
-  }
-}
 
 function _flashSaveBtn() {
   const btn = document.getElementById('save-btn');
