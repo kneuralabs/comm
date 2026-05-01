@@ -147,170 +147,6 @@
   /* ============================
      LANDING PAGE
   ============================== */
-  #landing-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
-    transition: opacity 0.4s ease;
-  }
-
-  #landing-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .landing-container {
-    max-width: 480px;
-    width: 100%;
-    padding: 0 24px;
-    text-align: center;
-  }
-
-  .landing-logo {
-    font-family: var(--sans);
-    font-weight: 900;
-    font-size: 42px;
-    letter-spacing: -0.02em;
-    margin-bottom: 8px;
-    color: var(--text);
-  }
-
-  .landing-logo sup {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text3);
-    margin-left: 2px;
-  }
-
-  .landing-subtitle {
-    font-size: 14px;
-    color: var(--text3);
-    margin-bottom: 48px;
-    font-weight: 500;
-  }
-
-  .landing-form {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 32px;
-    margin-bottom: 16px;
-  }
-
-  .landing-input-group {
-    margin-bottom: 20px;
-    text-align: left;
-  }
-
-  .landing-input-group:last-of-type {
-    margin-bottom: 0;
-  }
-
-  .landing-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text2);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .landing-input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    font-family: var(--mono);
-    font-size: 14px;
-    color: var(--text);
-    transition: border-color 0.2s, background 0.2s;
-  }
-
-  .landing-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: var(--surface3);
-  }
-
-  .landing-input::placeholder {
-    color: var(--text3);
-  }
-
-  .landing-btn {
-    width: 100%;
-    background: var(--accent);
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 14px 24px;
-    font-family: var(--sans);
-    font-size: 15px;
-    font-weight: 700;
-    color: white;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    margin-top: 24px;
-    letter-spacing: 0.02em;
-  }
-
-  .landing-btn:hover {
-    background: var(--accent2);
-  }
-
-  .landing-btn:active {
-    transform: scale(0.98);
-  }
-
-  .landing-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .landing-status {
-    margin-top: 16px;
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 500;
-    display: none;
-  }
-
-  .landing-status.error {
-    display: block;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: var(--red);
-  }
-
-  .landing-status.success {
-    display: block;
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    color: var(--green);
-  }
-
-  .landing-status.loading {
-    display: block;
-    background: rgba(79, 140, 255, 0.1);
-    border: 1px solid rgba(79, 140, 255, 0.3);
-    color: var(--accent);
-  }
-
-  .blink {
-    animation: blink 1s ease-in-out infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
   .header-actions { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
 
   .btn-icon {
@@ -1223,38 +1059,17 @@
 </head>
 <body>
 
-<!-- LANDING PAGE -->
-<div id="landing-overlay">
-  <div class="landing-container">
-    <div class="landing-logo">KneuraCOMM<sup>TM</sup></div>
-    <div class="landing-subtitle">Command Center Database</div>
-    
-    <div class="landing-form">
-      <div class="landing-input-group">
-        <label class="landing-label" for="github-token">GitHub Token</label>
-        <input 
-          type="password" 
-          id="github-token" 
-          class="landing-input" 
-          placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-          autocomplete="off"
-        />
-      </div>
-      
-      <div class="landing-input-group">
-        <label class="landing-label" for="github-repo">Repository (owner/repo)</label>
-        <input 
-          type="text" 
-          id="github-repo" 
-          class="landing-input" 
-          placeholder="kneuralabs/comm"
-          value="kneuralabs/comm"
-        />
-      </div>
-      
-      <button class="landing-btn" onclick="connectToGitHub()">Connect to Backend</button>
-      
-      <div id="landing-status" class="landing-status"></div>
+<!-- TOKEN MODAL for write auth -->
+<div class="overlay" id="token-modal" style="display:none" onclick="if(event.target===this)closeModal('token-modal')">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title">
+      <span>GitHub Token Required</span>
+      <button class="modal-close" onclick="closeModal('token-modal')">×</button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">A GitHub token is needed to save data. Token is stored locally.</p>
+    <input type="password" id="token-modal-input" class="input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="width:100%;margin-bottom:12px" autocomplete="off"/>
+    <div class="modal-actions">
+      <button class="btn" onclick="saveTokenFromModal()">Save &amp; Retry</button>
     </div>
   </div>
 </div>
@@ -1609,118 +1424,48 @@
 
 <script>
 // ==================== GITHUB INTEGRATION ====================
+const GITHUB_OWNER = 'kneuralabs';
+const GITHUB_REPO = 'comm';
+
 let GITHUB_CONFIG = {
   token: null,
-  owner: null,
-  repo: null,
-  connected: false
+  owner: GITHUB_OWNER,
+  repo: GITHUB_REPO,
+  connected: true
 };
 
-// Store GitHub config in localStorage
-function saveGitHubConfig() {
-  localStorage.setItem('github_config', JSON.stringify({
-    token: GITHUB_CONFIG.token,
-    owner: GITHUB_CONFIG.owner,
-    repo: GITHUB_CONFIG.repo
-  }));
-}
+let _pendingWriteResolve = null;
 
-// Load GitHub config from localStorage
 function loadGitHubConfig() {
   try {
-    const saved = localStorage.getItem('github_config');
-    if (saved) {
-      const config = JSON.parse(saved);
-      if (config.token && config.owner && config.repo) {
-        GITHUB_CONFIG.token = config.token;
-        GITHUB_CONFIG.owner = config.owner;
-        GITHUB_CONFIG.repo = config.repo;
-        GITHUB_CONFIG.connected = true;
-        return true;
-      }
-    }
+    const saved = localStorage.getItem('github_token');
+    if (saved) GITHUB_CONFIG.token = saved;
   } catch (e) {}
-  return false;
 }
 
-// Show landing page status message
-function showLandingStatus(message, type = 'loading') {
-  const statusEl = document.getElementById('landing-status');
-  statusEl.textContent = message;
-  statusEl.className = 'landing-status ' + type;
+function saveTokenFromModal() {
+  const t = document.getElementById('token-modal-input').value.trim();
+  if (!t) return;
+  GITHUB_CONFIG.token = t;
+  localStorage.setItem('github_token', t);
+  closeModal('token-modal');
+  if (_pendingWriteResolve) { _pendingWriteResolve(); _pendingWriteResolve = null; }
 }
 
-// Connect to GitHub and load data
-async function connectToGitHub() {
-  console.log('[DEBUG] ========== CONNECT TO GITHUB ==========');
-  
-  const token = document.getElementById('github-token').value.trim();
-  const repoInput = document.getElementById('github-repo').value.trim();
-  
-  console.log('[DEBUG] Token length:', token.length);
-  console.log('[DEBUG] Repository:', repoInput);
-  
-  if (!token) {
-    console.log('[ERROR] No token provided');
-    showLandingStatus('Please enter a GitHub token', 'error');
-    return;
-  }
-  
-  if (!repoInput || !repoInput.includes('/')) {
-    console.log('[ERROR] Invalid repository format');
-    showLandingStatus('Please enter a valid repository (owner/repo)', 'error');
-    return;
-  }
-  
-  const [owner, repo] = repoInput.split('/');
-  console.log('[DEBUG] Owner:', owner, 'Repo:', repo);
-  
-  showLandingStatus('Connecting to GitHub...', 'loading');
-  
-  // Store configuration
-  GITHUB_CONFIG.token = token;
-  GITHUB_CONFIG.owner = owner;
-  GITHUB_CONFIG.repo = repo;
-  GITHUB_CONFIG.connected = true;
-  saveGitHubConfig();
-  console.log('[DEBUG] GitHub config saved');
-  
-  // Try to read data from GitHub
-  try {
-    console.log('[DEBUG] Attempting to read data from GitHub...');
-    const data = await readDataFromGitHub();
-    
-    if (data && Object.keys(data).length > 0) {
-      console.log('[DEBUG] Data loaded successfully from GitHub');
-      // Data exists, load it
-      S = { ...S, ...data };
-      showLandingStatus('Data loaded successfully!', 'success');
-      setTimeout(() => {
-        console.log('[DEBUG] Hiding landing page and rendering application');
-        document.getElementById('landing-overlay').classList.add('hidden');
-        renderAll();
-      }, 800);
-    } else {
-      console.log('[DEBUG] No data found in GitHub database');
-      // No data or empty file
-      showLandingStatus('No data available in DATABASE', 'error');
-      document.querySelector('.landing-status').classList.add('blink');
-    }
-  } catch (error) {
-    console.error('[ERROR] GitHub connection error:', error);
-    showLandingStatus('Connection failed: ' + error.message, 'error');
-  }
-  
-  console.log('[DEBUG] ========== CONNECT TO GITHUB COMPLETE ==========');
+async function ensureWriteToken() {
+  if (GITHUB_CONFIG.token) return;
+  return new Promise(resolve => {
+    _pendingWriteResolve = resolve;
+    document.getElementById('token-modal').style.display = 'flex';
+    document.getElementById('token-modal-input').focus();
+  });
 }
 
-// Debug helper: Reset GitHub connection (call from console)
-window.resetGitHubConnection = function() {
-  console.log('[DEBUG] Resetting GitHub connection...');
-  localStorage.removeItem('github_config');
-  GITHUB_CONFIG = { token: null, owner: null, repo: null, connected: false };
-  document.getElementById('landing-overlay').classList.remove('hidden');
-  console.log('[DEBUG] GitHub connection reset. Reload page to reconnect.');
+// Debug helper: reset token
+window.resetGitHubToken = function() {
+  localStorage.removeItem('github_token');
+  GITHUB_CONFIG.token = null;
+  console.log('[DEBUG] Token cleared. Next save will prompt for token.');
 };
 
 // Read data.xlsx from GitHub
@@ -1728,14 +1473,11 @@ async function readDataFromGitHub() {
   console.log('[DEBUG] Reading data from GitHub:', GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo);
   try {
     const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main`;
-    
+
     console.log('[DEBUG] Fetching from URL:', url);
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${GITHUB_CONFIG.token}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
+    const headers = { 'Accept': 'application/vnd.github.v3+json' };
+    if (GITHUB_CONFIG.token) headers['Authorization'] = `Bearer ${GITHUB_CONFIG.token}`;
+    const response = await fetch(url, { headers });
     
     console.log('[DEBUG] Response status:', response.status);
     if (!response.ok) {
@@ -1785,11 +1527,9 @@ async function readDataFromGitHub() {
 
 // Write data.xlsx to GitHub
 async function writeDataToGitHub() {
-  if (!GITHUB_CONFIG.connected) {
-    console.log('[DEBUG] GitHub not connected, skipping sync');
-    return;
-  }
-  
+  await ensureWriteToken();
+  if (!GITHUB_CONFIG.token) { toast('Save skipped: no GitHub token'); return; }
+
   console.log('[DEBUG] Writing data to GitHub...');
   try {
     // Convert application data to Excel format
@@ -3429,42 +3169,21 @@ function exportData() {
 // ==================== INIT ====================
 (async () => {
   console.log('[DEBUG] ========== KNEURACOMM INITIALIZATION ==========');
-  
-  // Check if GitHub is already configured
-  const hasGitHubConfig = loadGitHubConfig();
-  console.log('[DEBUG] GitHub config found:', hasGitHubConfig);
-  
-  if (hasGitHubConfig && GITHUB_CONFIG.connected) {
-    console.log('[DEBUG] GitHub connected:', GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo);
-    // GitHub is configured, try to load data from GitHub
-    try {
-      const data = await readDataFromGitHub();
-      if (data && Object.keys(data).length > 0) {
-        console.log('[DEBUG] Data loaded from GitHub successfully');
-        S = { ...S, ...data };
-        // Hide landing page
-        document.getElementById('landing-overlay').classList.add('hidden');
-      } else {
-        console.log('[DEBUG] No data in GitHub, using localStorage fallback');
-        // No data in GitHub, load from localStorage as fallback
-        await load();
-        // Still hide landing page since we have config
-        document.getElementById('landing-overlay').classList.add('hidden');
-      }
-    } catch (error) {
-      console.error('[ERROR] GitHub load error:', error);
-      // Fallback to localStorage
+  loadGitHubConfig();
+
+  try {
+    const data = await readDataFromGitHub();
+    if (data && Object.keys(data).length > 0) {
+      S = { ...S, ...data };
+      console.log('[DEBUG] Data loaded from GitHub successfully');
+    } else {
       await load();
-      // Still hide landing page since we have config
-      document.getElementById('landing-overlay').classList.add('hidden');
     }
-  } else {
-    console.log('[DEBUG] No GitHub config, showing landing page');
-    // No GitHub config, show landing page and load from localStorage
+  } catch (error) {
+    console.error('[ERROR] GitHub load error, falling back to localStorage:', error);
     await load();
-    // Landing page stays visible
   }
-  
+
   console.log('[DEBUG] Rendering application...');
   renderAll();
   setInterval(renderDate, 60000);
