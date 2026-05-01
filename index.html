@@ -89,6 +89,7 @@
   }
 
   .logo {
+    display: flex; align-items: center; gap: 8px;
     font-family: var(--sans);
     font-weight: 900;
     font-size: 15px;
@@ -99,6 +100,7 @@
     flex-shrink: 0;
   }
   .logo span { color: var(--accent); }
+  .logo-img { height: 26px; width: auto; background: transparent; flex-shrink: 0; }
 
   /* Logo short form on small screens */
   .logo-full { display: inline; }
@@ -1036,6 +1038,7 @@
   <div class="header-top">
     <button id="sb-toggle" onclick="toggleMobileSidebar()" title="Menu" aria-label="Menu">☰</button>
     <div class="logo">
+      <img src="LOGO.png" alt="Kneuralabs" class="logo-img"/>
       <span class="logo-full">KNEURALABS<span> // </span>CMD</span>
       <span class="logo-short">KNL<span> // </span>CMD</span>
     </div>
