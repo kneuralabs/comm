@@ -1466,10 +1466,14 @@ window.resetGitHubToken = function() {
 async function readDataFromGitHub() {
   console.log('[DEBUG] Reading data from GitHub:', GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo);
   try {
-    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main`;
+    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main&_t=${Date.now()}`;
 
     console.log('[DEBUG] Fetching from URL:', url);
-    const headers = { 'Accept': 'application/vnd.github.v3+json' };
+    const headers = {
+      'Accept': 'application/vnd.github.v3+json',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
+    };
     if (GITHUB_CONFIG.token) headers['Authorization'] = `Bearer ${GITHUB_CONFIG.token}`;
     const response = await fetch(url, { headers });
     
@@ -1541,8 +1545,13 @@ async function writeDataToGitHub() {
     
     const fetchSHA = async () => {
       try {
-        const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main`, {
-          headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json' }
+        const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main&_t=${Date.now()}`, {
+          headers: {
+            'Authorization': `Bearer ${GITHUB_CONFIG.token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
         });
         if (r.ok) { const d = await r.json(); return d.sha; }
       } catch (e) {}
@@ -1562,9 +1571,12 @@ async function writeDataToGitHub() {
     let sha = await fetchSHA();
     let response = await putFile(sha);
 
-    // On 409 conflict, re-fetch SHA and retry once
-    if (response.status === 409) {
-      console.log('[DEBUG] 409 conflict, re-fetching SHA and retrying...');
+    // On 409 conflict, re-fetch fresh SHA and retry up to 3 times
+    let retries = 0;
+    while (response.status === 409 && retries < 3) {
+      retries++;
+      console.log(`[DEBUG] 409 conflict, re-fetching SHA and retrying (attempt ${retries})...`);
+      await new Promise(r => setTimeout(r, retries * 300));
       sha = await fetchSHA();
       response = await putFile(sha);
     }
