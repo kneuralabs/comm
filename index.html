@@ -7,11 +7,28 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>KneuraCOMM™ - Command Center</title>
+<meta name="description" content="KneuraCOMM Command Center — manage tasks, projects, payments, and decisions for your team in one place.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://kneuralabs.github.io/comm/">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kneuralabs.github.io/comm/">
+<meta property="og:title" content="KneuraCOMM™ - Command Center">
+<meta property="og:description" content="Manage tasks, projects, payments, and decisions for your team in one place.">
+<meta property="og:image" content="https://kneuralabs.github.io/comm/LOGO.png">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="KneuraCOMM™ - Command Center">
+<meta name="twitter:description" content="Manage tasks, projects, payments, and decisions for your team in one place.">
+<meta name="twitter:image" content="https://kneuralabs.github.io/comm/LOGO.png">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="LOGO.png">
+<link rel="apple-touch-icon" href="LOGO.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <!-- SheetJS for Excel processing -->
-<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js" defer></script>
 <style>
   :root {
     --bg: #08090b;
@@ -575,6 +592,13 @@
   .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+  .input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 12px; font-family: var(--mono);
+    font-size: 13px; color: var(--text); transition: border-color 0.2s;
+  }
+  .input:focus { outline: none; border-color: var(--accent); }
+  .input::placeholder { color: var(--text3); }
 
   /* ============================
      BUTTONS
