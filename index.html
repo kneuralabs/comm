@@ -1545,49 +1545,42 @@ async function writeDataToGitHub() {
     const wbout = XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
     console.log('[DEBUG] Excel file created, base64 length:', wbout.length);
     
-    // Get current SHA if file exists
-    let sha = null;
-    try {
-      const getUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main`;
-      const getResponse = await fetch(getUrl, {
-        headers: {
-          'Authorization': `Bearer ${GITHUB_CONFIG.token}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
+    const fetchSHA = async () => {
+      try {
+        const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main`, {
+          headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json' }
+        });
+        if (r.ok) { const d = await r.json(); return d.sha; }
+      } catch (e) {}
+      return null;
+    };
+
+    const putFile = async (sha) => {
+      const body = { message: 'Update data from KneuraCOMM', content: wbout, branch: 'main' };
+      if (sha) body.sha = sha;
+      return fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
       });
-      if (getResponse.ok) {
-        const fileData = await getResponse.json();
-        sha = fileData.sha;
-        console.log('[DEBUG] Found existing file, SHA:', sha.substring(0, 8) + '...');
-      }
-    } catch (e) {
-      console.log('[DEBUG] No existing file or error getting SHA:', e.message);
+    };
+
+    let sha = await fetchSHA();
+    let response = await putFile(sha);
+
+    // On 409 conflict, re-fetch SHA and retry once
+    if (response.status === 409) {
+      console.log('[DEBUG] 409 conflict, re-fetching SHA and retrying...');
+      sha = await fetchSHA();
+      response = await putFile(sha);
     }
-    
-    // Upload to GitHub
-    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx`;
-    console.log('[DEBUG] Uploading to GitHub...');
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${GITHUB_CONFIG.token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: 'Update data from KneuraCOMM',
-        content: wbout,
-        sha: sha,
-        branch: 'main'
-      })
-    });
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('[ERROR] GitHub upload failed:', response.status, errorText);
       throw new Error(`GitHub upload failed: ${response.status}`);
     }
-    
+
     const result = await response.json();
     console.log('[DEBUG] Data pushed to GitHub successfully, new SHA:', result.content?.sha?.substring(0, 8) + '...');
   } catch (error) {
