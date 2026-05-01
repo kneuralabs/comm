@@ -119,30 +119,6 @@
     text-align: center;
   }
 
-  /* AUTOSAVE */
-  #autosave-status {
-    display: flex; align-items: center; gap: 5px;
-    padding: 4px 10px; border-radius: 20px;
-    background: var(--surface2); border: 1px solid var(--border);
-    font-family: var(--mono); font-size: 12px; color: var(--text3);
-    white-space: nowrap; transition: border-color 0.3s, background 0.3s;
-    flex-shrink: 0;
-  }
-  #autosave-status.saving { border-color: rgba(79,140,255,0.4); background: rgba(79,140,255,0.06); }
-  #autosave-status.saved  { border-color: rgba(34,197,94,0.35);  background: rgba(34,197,94,0.06); }
-  #autosave-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--text3); flex-shrink: 0; transition: background 0.3s;
-  }
-  #autosave-status.saving #autosave-dot { background: var(--accent); animation: savePulse 0.8s ease infinite; }
-  #autosave-status.saved  #autosave-dot { background: var(--green); }
-  #autosave-label { transition: color 0.3s; }
-  #autosave-status.saving #autosave-label { color: var(--accent); }
-  #autosave-status.saved  #autosave-label { color: var(--green); }
-
-  @keyframes savePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-  @keyframes savedFlash { 0%{opacity:0;transform:scale(0.9)} 15%{opacity:1;transform:scale(1.05)} 100%{opacity:1;transform:scale(1)} }
-  #autosave-status.saved { animation: savedFlash 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
 
   /* ============================
      LANDING PAGE
@@ -907,9 +883,7 @@
     /* Bottom nav visible, sidebar overlays */
     #mobile-nav { display: flex; flex-direction: column; }
     #sb-toggle  { display: flex; }
-    #autosave-label { display: none; }
-    #autosave-status { padding: 4px 7px; }
-    #intel-toggle { display: none; }
+#intel-toggle { display: none; }
     .header-date { display: none; }
     .kbd-hint { display: none; }
 
@@ -1082,10 +1056,6 @@
       <span class="logo-short">KNL<span> // </span>CMD</span>
     </div>
     <div class="header-date" id="header-date"></div>
-    <div id="autosave-status" title="Autosave status">
-      <span id="autosave-dot"></span>
-      <span id="autosave-label">—</span>
-    </div>
     <div class="header-actions">
       <button id="intel-toggle" onclick="toggleIntelPanel()" title="Intel Panel">⚡</button>
       <button id="save-btn" class="btn-save" onclick="manualSave()" title="Save (Ctrl+S)">
@@ -1969,44 +1939,12 @@ async function load() {
   }
 
   _updateSaveBtn();
-  if (_lastSavedAt) _showSaved(_lastSavedAt, false);
+  if (_lastSavedAt) _flashSaveBtn();
 }
 
-// ---- Autosave UI ----
-function _showSaving() {
-  const el = document.getElementById('autosave-status'), lbl = document.getElementById('autosave-label');
-  if (!el) return;
-  el.className = 'saving'; lbl.textContent = 'Saving…';
-}
-function _showSaved(date, isManual) {
-  const el = document.getElementById('autosave-status'), lbl = document.getElementById('autosave-label');
-  if (!el) return;
-  const label = (isManual ? '✓ Saved ' : 'Saved ') + _fmtSaveTime(date);
-  el.className = 'saved'; lbl.textContent = label;
-  if (isManual) _flashSaveBtn();
-  setTimeout(() => { if (el.className === 'saved') { el.className = ''; lbl.textContent = 'Saved ' + _fmtSaveTime(date); } }, isManual ? 3000 : 4000);
-}
-function _showError() {
-  const el = document.getElementById('autosave-status'), lbl = document.getElementById('autosave-label');
-  if (!el) return;
-  el.className = ''; el.style.borderColor = 'rgba(239,68,68,0.4)'; lbl.textContent = 'Save failed'; lbl.style.color = 'var(--red)';
-  setTimeout(() => { el.style.borderColor = ''; lbl.style.color = ''; lbl.textContent = _lastSavedAt ? 'Saved ' + _fmtSaveTime(_lastSavedAt) : '—'; }, 3000);
-}
-function _fmtSaveTime(date) {
-  if (!date) return '—';
-  const diffSec = Math.floor((new Date() - date) / 1000);
-  if (diffSec < 5)  return 'just now';
-  if (diffSec < 60) return `${diffSec}s ago`;
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin}m ago`;
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-setInterval(() => {
-  if (_lastSavedAt) {
-    const lbl = document.getElementById('autosave-label'), el = document.getElementById('autosave-status');
-    if (lbl && el && el.className !== 'saving') lbl.textContent = 'Saved ' + _fmtSaveTime(_lastSavedAt);
-  }
-}, 15000);
+function _showSaving() {}
+function _showSaved(date, isManual) { if (isManual) _flashSaveBtn(); }
+function _showError() { toast('Save failed'); }
 
 // ---- Save button state ----
 function _updateSaveBtn() {
