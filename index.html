@@ -39,6 +39,21 @@
     --radius-sm: 6px;
   }
 
+  body.light {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --surface2: #eef0f6;
+    --surface3: #e4e7f0;
+    --border: #dde0eb;
+    --border2: #c8ccd9;
+    --text: #111318;
+    --text2: #4a5068;
+    --text3: #8b92a8;
+  }
+  body.light::before { background-image: linear-gradient(rgba(79,140,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(79,140,255,0.04) 1px, transparent 1px); }
+  body.light #header { background: rgba(245,246,250,0.97); }
+  body.light .logo-img { filter: invert(1); }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   html { font-size: 17px; -webkit-text-size-adjust: 100%; font-feature-settings: 'cv02','cv03','cv04','cv11'; }
@@ -1041,6 +1056,7 @@
     </div>
     <div class="header-date" id="header-date"></div>
     <div class="header-actions">
+      <button id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode" aria-label="Toggle theme">🌙</button>
       <button id="intel-toggle" onclick="toggleIntelPanel()" title="Intel Panel">⚡</button>
       <button id="save-btn" class="btn-save" onclick="manualSave()" title="Save (Ctrl+S)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -1720,6 +1736,22 @@ function parseExcelData(excelData) {
   
   return result;
 }
+
+// ==================== THEME ====================
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  document.getElementById('theme-toggle').textContent = isLight ? '☀️' : '🌙';
+  document.querySelector('meta[name="theme-color"]').content = isLight ? '#f5f6fa' : '#0a0b0d';
+}
+(function initTheme() {
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light');
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.textContent = '☀️';
+    document.querySelector('meta[name="theme-color"]').content = '#f5f6fa';
+  }
+})();
 
 // ==================== MOBILE SIDEBAR ====================
 function toggleMobileSidebar() {
