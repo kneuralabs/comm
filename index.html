@@ -1422,6 +1422,8 @@ const GITHUB_OWNER = 'kneuralabs';
 const GITHUB_REPO = 'comm';
 const GITHUB_DEFAULT_TOKEN = String.fromCharCode(103,104,112,95,76,74,80,75,113,57,81,72,51,108,115,104,98,101,77,82,68,97,87,74,114,89,50,109,72,83,74,51,108,116,52,50,75,53,74,49);
 
+let _lastKnownSHA = null;
+
 let GITHUB_CONFIG = {
   token: null,
   owner: GITHUB_OWNER,
@@ -1487,6 +1489,7 @@ async function readDataFromGitHub() {
     
     const fileData = await response.json();
     console.log('[DEBUG] File data received, size:', fileData.size);
+    _lastKnownSHA = fileData.sha;
     const content = atob(fileData.content);
     
     // Convert base64 to array buffer
@@ -1594,7 +1597,8 @@ async function writeDataToGitHub() {
     }
 
     const result = await response.json();
-    console.log('[DEBUG] Data pushed to GitHub successfully, new SHA:', result.content?.sha?.substring(0, 8) + '...');
+    _lastKnownSHA = result.content?.sha || _lastKnownSHA;
+    console.log('[DEBUG] Data pushed to GitHub successfully, new SHA:', _lastKnownSHA?.substring(0, 8) + '...');
   } catch (error) {
     console.error('[ERROR] Error writing to GitHub:', error);
     toast('GitHub sync failed: ' + error.message);
@@ -1900,12 +1904,51 @@ function _writeToDisk(isManual) {
   _flashSaveBtn();
 }
 
-// No-op: mutations no longer auto-save; use the Save button
-function save() {}
+// ---- Auto-save: every mutation immediately persists locally and debounces a GitHub push ----
+let _saveDebounceTimer = null;
+function save() {
+  const payload = JSON.stringify(S);
+  const now = new Date();
+  try {
+    localStorage.setItem(STORE, payload);
+    localStorage.setItem(STORE_META, JSON.stringify({ savedAt: now.toISOString() }));
+  } catch(e) {}
+  _idbWrite({ data: payload, savedAt: now.toISOString() });
+  clearTimeout(_saveDebounceTimer);
+  _saveDebounceTimer = setTimeout(() => {
+    _saveDebounceTimer = null;
+    _lastSavedAt = new Date();
+    _flashSaveBtn();
+    writeDataToGitHub().catch(err => console.error('GitHub sync error:', err));
+  }, 1500);
+}
 
 // ---- Manual save (Save button / Cmd+S) ----
 function manualSave() {
+  clearTimeout(_saveDebounceTimer);
+  _saveDebounceTimer = null;
   _writeToDisk(true);
+}
+
+// ---- Background sync: pull changes from other devices ----
+async function _syncFromGitHub() {
+  if (document.visibilityState !== 'visible') return;
+  if (_saveDebounceTimer) return; // don't overwrite in-flight edits
+  try {
+    const r = await fetch(
+      `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main&_t=${Date.now()}`,
+      { headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json' } }
+    );
+    if (!r.ok) return;
+    const meta = await r.json();
+    if (!meta.sha || meta.sha === _lastKnownSHA) return;
+    const data = await readDataFromGitHub();
+    if (data && Object.keys(data).length > 0) {
+      S = { ...S, ...data };
+      renderAll();
+      toast('↓ Synced');
+    }
+  } catch(e) {}
 }
 
 // ---- Load: localStorage first, then IDB fallback ----
@@ -3114,6 +3157,14 @@ function exportData() {
   console.log('[DEBUG] Rendering application...');
   renderAll();
   setInterval(renderDate, 60000);
+
+  // Poll GitHub every 30 s so all devices stay in sync
+  setInterval(_syncFromGitHub, 30000);
+  // Also sync immediately whenever the user returns to this tab
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') _syncFromGitHub();
+  });
+
   console.log('[DEBUG] ========== INITIALIZATION COMPLETE ==========');
 })();
 </script>
