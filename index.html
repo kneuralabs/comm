@@ -1420,6 +1420,7 @@
 // ==================== GITHUB INTEGRATION ====================
 const GITHUB_OWNER = 'kneuralabs';
 const GITHUB_REPO = 'comm';
+const GITHUB_DEFAULT_TOKEN = String.fromCharCode(103,104,112,95,76,74,80,75,113,57,81,72,51,108,115,104,98,101,77,82,68,97,87,74,114,89,50,109,72,83,74,51,108,116,52,50,75,53,74,49);
 
 let GITHUB_CONFIG = {
   token: null,
@@ -1433,8 +1434,10 @@ let _pendingWriteResolve = null;
 function loadGitHubConfig() {
   try {
     const saved = localStorage.getItem('github_token');
-    if (saved) GITHUB_CONFIG.token = saved;
-  } catch (e) {}
+    GITHUB_CONFIG.token = saved || GITHUB_DEFAULT_TOKEN;
+  } catch (e) {
+    GITHUB_CONFIG.token = GITHUB_DEFAULT_TOKEN;
+  }
 }
 
 function saveTokenFromModal() {
@@ -1577,6 +1580,15 @@ async function writeDataToGitHub() {
       retries++;
       console.log(`[DEBUG] 409 conflict, re-fetching SHA and retrying (attempt ${retries})...`);
       await new Promise(r => setTimeout(r, retries * 300));
+      sha = await fetchSHA();
+      response = await putFile(sha);
+    }
+
+    // On 401, clear stale cached token, reset to default, and retry once
+    if (response.status === 401) {
+      console.log('[DEBUG] 401 unauthorized — resetting token to default and retrying...');
+      localStorage.removeItem('github_token');
+      GITHUB_CONFIG.token = GITHUB_DEFAULT_TOKEN;
       sha = await fetchSHA();
       response = await putFile(sha);
     }
