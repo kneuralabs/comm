@@ -564,6 +564,7 @@
     max-width: 520px; max-height: 88vh; overflow-y: auto;
     animation: scaleIn 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
     box-shadow: 0 24px 80px rgba(0,0,0,0.65);
+    overscroll-behavior: contain;
   }
 
   .modal-title {
@@ -936,7 +937,7 @@
     .metric-label { font-size: 10px; }
 
     #command-bar { padding: 8px 12px; gap: 6px; }
-    #command-input { font-size: 15px; min-width: 0; }
+    #command-input { font-size: 16px; min-width: 0; }
     .filter-chips { display: none; }
     .btn-reset { display: none; }
 
@@ -953,6 +954,9 @@
     }
     .form-grid-2 { grid-template-columns: 1fr; }
     #toast { bottom: calc(var(--mobile-nav-h) + 12px); right: 12px; left: 12px; text-align: center; }
+    /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+    .form-row input, .form-row select, .form-row textarea,
+    #decision-input, .input { font-size: 16px; }
   }
 
   /* ── PHONE LANDSCAPE override (short viewport) ── */
@@ -2834,7 +2838,8 @@ document.addEventListener('keydown', e => {
   const inInput = ['input','textarea','select'].includes(tag);
 
   if (e.key === 'Escape') {
-    document.querySelectorAll('.overlay').forEach(o=>o.style.display='none');
+    const open = [...document.querySelectorAll('.overlay')].find(o => o.style.display !== 'none');
+    if (open) { closeModal(open.id); return; }
     closeIntelPanel();
     clearFilters(); return;
   }
@@ -2856,6 +2861,19 @@ document.getElementById('command-input').addEventListener('input', function() {
   else F.search = '';
   renderAll();
 });
+
+// Guard: only close overlay if the touch/click started on the overlay itself (prevents mobile ghost closes)
+(function() {
+  let _mdTarget = null;
+  document.addEventListener('mousedown', e => { _mdTarget = e.target; }, true);
+  document.addEventListener('touchstart', e => { _mdTarget = e.target; }, { capture: true, passive: true });
+  document.querySelectorAll('.overlay').forEach(overlay => {
+    overlay.removeAttribute('onclick');
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay && _mdTarget === overlay) closeModal(overlay.id);
+    });
+  });
+})();
 
 document.getElementById('command-input').addEventListener('keydown', function(e) {
   if (e.key !== 'Enter') return;
