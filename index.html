@@ -3,27 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0b0d">
+<meta name="theme-color" content="#07111e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KneuraCOMM™ - Command Center</title>
-<meta name="description" content="KneuraCOMM Command Center — manage tasks, projects, payments, and decisions for your team in one place.">
+<title>KneuraCOMM™ — Command Centre</title>
+<meta name="description" content="KneuraCOMM™ — the command centre for AI governance leaders. Manage tasks, projects, payments, and decisions in one place.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://kneuralabs.github.io/comm/">
+<link rel="canonical" href="https://comm.kneuralabs.com/">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://kneuralabs.github.io/comm/">
-<meta property="og:title" content="KneuraCOMM™ - Command Center">
-<meta property="og:description" content="Manage tasks, projects, payments, and decisions for your team in one place.">
-<meta property="og:image" content="https://kneuralabs.github.io/comm/og-image.png">
+<meta property="og:url" content="https://comm.kneuralabs.com/">
+<meta property="og:title" content="KneuraCOMM™ — Command Centre">
+<meta property="og:description" content="Command centre for AI governance leaders. Tasks, projects, decisions, and payments — all in one place.">
+<meta property="og:image" content="https://comm.kneuralabs.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="KneuraCOMM™ Command Center">
+<meta property="og:image:alt" content="KneuraCOMM™ — Command Centre by Kneuralabs">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="KneuraCOMM™ - Command Center">
-<meta name="twitter:description" content="Manage tasks, projects, payments, and decisions for your team in one place.">
-<meta name="twitter:image" content="https://kneuralabs.github.io/comm/og-image.png">
+<meta name="twitter:title" content="KneuraCOMM™ — Command Centre">
+<meta name="twitter:description" content="Command centre for AI governance leaders. Tasks, projects, decisions, and payments — all in one place.">
+<meta name="twitter:image" content="https://comm.kneuralabs.com/og-image.png">
 <!-- Favicon -->
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -37,25 +37,28 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js" defer></script>
 <style>
   :root {
-    --bg: #08090b;
-    --surface: #0f1115;
-    --surface2: #161920;
-    --surface3: #1c1f28;
-    --border: #21252e;
-    --border2: #2b3040;
-    --text: #eaedf5;
-    --text2: #8c92a4;
-    --text3: #505769;
-    --accent: #4f8cff;
-    --accent2: #3a6fd4;
+    /* Kneuralabs brand palette — dark mode */
+    --bg: #07111e;
+    --surface: #0a1929;
+    --surface2: #0d2240;
+    --surface3: #102b52;
+    --border: #1a3a62;
+    --border2: #1e4875;
+    --text: #f7f8fa;
+    --text2: #a8b8cc;
+    --text3: #4a6080;
+    --accent: #1c5caa;      /* Royal Authority Blue */
+    --accent-hover: #4a8bc8; /* Sky Blue */
+    --accent2: #0d2e5a;     /* Deep Navy */
     --green: #22c55e;
     --yellow: #f59e0b;
-    --red: #ef4444;
+    --red: #c8281e;         /* Precision Red */
     --orange: #f97316;
     --purple: #a855f7;
-    --cyan: #06b6d4;
-    --mono: 'Inter', monospace;
-    --sans: 'Inter', sans-serif;
+    --cyan: #4a8bc8;        /* Sky Blue */
+    --silver: #d0d2d6;      /* Structural Silver */
+    --mono: 'Inter', 'Aptos Display', sans-serif;
+    --sans: 'Inter', 'Aptos Display', sans-serif;
     --header-h: 111px;
     --mobile-nav-h: 60px;
     --radius: 10px;
@@ -63,18 +66,23 @@
   }
 
   body.light {
-    --bg: #f5f6fa;
+    /* Kneuralabs brand palette — light mode */
+    --bg: #f7f8fa;        /* Canvas White */
     --surface: #ffffff;
     --surface2: #eef0f6;
-    --surface3: #e4e7f0;
-    --border: #dde0eb;
+    --surface3: #e0e4ea;  /* Frost Gray */
+    --border: #e0e4ea;    /* Frost Gray */
     --border2: #c8ccd9;
-    --text: #111318;
-    --text2: #4a5068;
-    --text3: #8b92a8;
+    --text: #1a1d23;      /* Ink Charcoal */
+    --text2: #6b7280;     /* Slate Gray */
+    --text3: #9aa3af;
+    --accent: #1c5caa;
+    --accent-hover: #4a8bc8;
+    --accent2: #0d2e5a;
+    --red: #c8281e;
   }
-  body.light::before { background-image: linear-gradient(rgba(79,140,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(79,140,255,0.04) 1px, transparent 1px); }
-  body.light #header { background: rgba(245,246,250,0.97); }
+  body.light::before { background-image: linear-gradient(rgba(28,92,170,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(28,92,170,0.03) 1px, transparent 1px); }
+  body.light #header { background: rgba(247,248,250,0.97); border-bottom-color: var(--border); }
   body.light .logo-img { filter: none; mix-blend-mode: normal; }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -96,8 +104,8 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(79,140,255,0.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(79,140,255,0.015) 1px, transparent 1px);
+      linear-gradient(rgba(28,92,170,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28,92,170,0.06) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
     z-index: 0;
@@ -112,7 +120,7 @@
   ============================== */
   #header {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(8,9,11,0.97);
+    background: rgba(7,17,30,0.97);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     border-bottom: 1px solid var(--border);
@@ -285,7 +293,7 @@
     min-height: 44px;
   }
   .nav-item:hover { background: var(--surface2); color: var(--text); padding-left: 20px; }
-  .nav-item.active { background: var(--surface2); color: var(--accent); border-left-color: var(--accent); padding-left: 20px; }
+  .nav-item.active { background: rgba(28,92,170,0.12); color: var(--accent-hover); border-left-color: var(--accent); padding-left: 20px; }
 
   .nav-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
@@ -295,14 +303,14 @@
     font-family: var(--mono);
   }
   .role-count.blocked-flag { background: rgba(249,115,22,0.15); color: var(--orange); }
-  .role-count.overdue-flag { background: rgba(239,68,68,0.15); color: var(--red); }
+  .role-count.overdue-flag { background: rgba(200,40,30,0.15); color: var(--red); }
 
   .btn-add-small {
     width: 100%; background: none; border: none; color: var(--text3);
     font-family: var(--sans); font-size: 13.5px; padding: 10px 16px;
     text-align: left; cursor: pointer; transition: color 0.12s; min-height: 40px;
   }
-  .btn-add-small:hover { color: var(--accent); }
+  .btn-add-small:hover { color: var(--accent-hover); }
 
   /* ============================
      COMMAND BAR
@@ -319,7 +327,7 @@
     padding: 10px 12px; outline: none; transition: border-color 0.15s;
     -webkit-appearance: none;
   }
-  #command-input:focus { border-color: var(--accent); }
+  #command-input:focus { border-color: var(--accent-hover); box-shadow: 0 0 0 2px rgba(28,92,170,0.2); }
   #command-input::placeholder { color: var(--text3); }
 
   .filter-chips { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
@@ -333,11 +341,11 @@
     min-height: 34px; display: flex; align-items: center;
   }
   .chip:hover { border-color: var(--border2); color: var(--text); }
-  .chip.active         { background: rgba(79,140,255,0.15);  border-color: var(--accent);  color: var(--accent);  }
-  .chip.red.active     { background: rgba(239,68,68,0.15);   border-color: var(--red);     color: var(--red);     }
-  .chip.yellow.active  { background: rgba(245,158,11,0.15);  border-color: var(--yellow);  color: var(--yellow);  }
-  .chip.orange.active  { background: rgba(249,115,22,0.15);  border-color: var(--orange);  color: var(--orange);  }
-  .chip.green.active   { background: rgba(34,197,94,0.12);   border-color: var(--green);   color: var(--green);   }
+  .chip.active         { background: rgba(28,92,170,0.18);   border-color: var(--accent);       color: var(--accent-hover); }
+  .chip.red.active     { background: rgba(200,40,30,0.15);   border-color: var(--red);          color: var(--red);          }
+  .chip.yellow.active  { background: rgba(245,158,11,0.15);  border-color: var(--yellow);       color: var(--yellow);       }
+  .chip.orange.active  { background: rgba(249,115,22,0.15);  border-color: var(--orange);       color: var(--orange);       }
+  .chip.green.active   { background: rgba(34,197,94,0.12);   border-color: var(--green);        color: var(--green);        }
 
   .btn-reset {
     font-size: 13px; padding: 7px 12px; background: var(--surface3);
@@ -345,7 +353,7 @@
     cursor: pointer; transition: all 0.12s; flex-shrink: 0; font-family: var(--sans);
     min-height: 34px;
   }
-  .btn-reset:hover { color: var(--red); border-color: rgba(239,68,68,0.4); }
+  .btn-reset:hover { color: var(--red); border-color: rgba(200,40,30,0.4); }
 
   /* ============================
      VIEW TABS
@@ -370,7 +378,7 @@
     transition: left 0.25s cubic-bezier(0.22,1,0.36,1), right 0.25s cubic-bezier(0.22,1,0.36,1);
   }
   .view-tab:hover { color: var(--text2); }
-  .view-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .view-tab.active { color: var(--accent-hover); border-bottom-color: var(--accent); }
   .view-tab.active::after { left: 0; right: 0; }
 
   .view-panel { display: none; }
@@ -414,9 +422,9 @@
   .task-card.priority-high::before   { background: var(--red); }
   .task-card.priority-medium::before { background: var(--yellow); }
   .task-card.priority-low::before    { background: var(--text3); }
-  .task-card:hover { background: var(--surface3); border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-  .task-card.overdue     { border-color: rgba(239,68,68,0.3); }
-  .task-card.due-soon    { border-color: rgba(245,158,11,0.2); }
+  .task-card:hover { background: var(--surface3); border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(28,92,170,0.2); }
+  .task-card.overdue     { border-color: rgba(200,40,30,0.35); }
+  .task-card.due-soon    { border-color: rgba(245,158,11,0.25); }
   .task-card.status-done { opacity: 0.42; }
   .task-card.status-blocked { border-color: rgba(249,115,22,0.35); }
 
@@ -440,10 +448,10 @@
   }
   .status-tag:hover { opacity: 0.75; }
   .status-pending     { background: rgba(139,144,158,0.15); color: var(--text2); }
-  .status-in-progress { background: rgba(79,140,255,0.15);  color: var(--accent); }
+  .status-in-progress { background: rgba(28,92,170,0.18);   color: var(--accent-hover); }
   .status-blocked     { background: rgba(249,115,22,0.15);  color: var(--orange); animation: pulse-border 2s ease infinite; }
   .status-done        { background: rgba(34,197,94,0.12);   color: var(--green); }
-  .status-overdue     { background: rgba(239,68,68,0.15);   color: var(--red); }
+  .status-overdue     { background: rgba(200,40,30,0.15);   color: var(--red); }
 
   .task-meta { display: flex; align-items: center; gap: 5px; padding-left: 24px; flex-wrap: wrap; }
 
@@ -451,8 +459,8 @@
     font-size: 12px; color: var(--text3); background: var(--surface3);
     padding: 2px 7px; border-radius: 3px; font-weight: 500;
   }
-  .task-tag.role    { color: var(--cyan);   background: rgba(6,182,212,0.1); }
-  .task-tag.project { color: var(--purple); background: rgba(168,85,247,0.1); }
+  .task-tag.role    { color: var(--cyan);   background: rgba(74,139,200,0.12); }
+  .task-tag.project { color: var(--purple); background: rgba(168,85,247,0.10); }
 
   .task-due { font-size: 12px; margin-left: auto; flex-shrink: 0; font-family: var(--mono); }
   .task-due.overdue  { color: var(--red); }
@@ -464,7 +472,7 @@
     margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .task-next-action::before { content: '→ '; color: var(--accent); }
+  .task-next-action::before { content: '→ '; color: var(--accent-hover); }
 
   /* ============================
      PROJECT CARDS
@@ -483,7 +491,7 @@
                 border-color 0.15s, background 0.15s;
     -webkit-tap-highlight-color: transparent;
   }
-  .project-card:hover { border-color: var(--border2); background: var(--surface3); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+  .project-card:hover { border-color: var(--accent); background: var(--surface3); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(28,92,170,0.2); }
   .project-card.has-blocked { border-color: rgba(249,115,22,0.3); }
 
   .project-name {
@@ -592,7 +600,7 @@
     padding: 11px 13px; outline: none; transition: border-color 0.2s;
     -webkit-appearance: none; -moz-appearance: none;
   }
-  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--accent); }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--accent-hover); box-shadow: 0 0 0 2px rgba(28,92,170,0.2); outline: none; }
   .form-row textarea { min-height: 64px; resize: vertical; font-family: var(--sans); }
   .form-row select option { background: var(--surface2); }
 
@@ -604,7 +612,7 @@
     border-radius: var(--radius-sm); padding: 10px 12px; font-family: var(--mono);
     font-size: 13px; color: var(--text); transition: border-color 0.2s;
   }
-  .input:focus { outline: none; border-color: var(--accent); }
+  .input:focus { outline: none; border-color: var(--accent-hover); box-shadow: 0 0 0 2px rgba(28,92,170,0.2); }
   .input::placeholder { color: var(--text3); }
 
   /* ============================
@@ -617,11 +625,11 @@
     min-height: 44px;
   }
   .btn:active { transform: scale(0.97); }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:hover { background: var(--accent2); }
+  .btn-primary { background: var(--accent); color: #fff; transition: background 0.2s, box-shadow 0.2s; }
+  .btn-primary:hover { background: var(--accent2); box-shadow: 0 2px 12px rgba(28,92,170,0.4); }
   .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
-  .btn-ghost:hover { background: var(--surface3); color: var(--text); }
-  .btn-danger { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-ghost:hover { background: var(--surface3); color: var(--text); border-color: var(--border2); }
+  .btn-danger { background: rgba(200,40,30,0.10); color: var(--red); border: 1px solid rgba(200,40,30,0.25); }
   .btn-danger:hover { background: var(--red); color: #fff; }
 
   /* ============================
@@ -659,8 +667,8 @@
   /* ============================
      ROLE DOTS
   ============================== */
-  .rd-CEO { background: #4f8cff; }
-  .rd-COO { background: #06b6d4; }
+  .rd-CEO { background: #1c5caa; }
+  .rd-COO { background: #4a8bc8; }
   .rd-CFO { background: #22c55e; }
   .rd-CMO { background: #a855f7; }
   .rd-CIO { background: #f59e0b; }
@@ -690,9 +698,9 @@
     border-radius: 4px; font-size: 13px; transition: all 0.12s; flex-shrink: 0;
   }
   .role-edit-btn { color: var(--text3); }
-  .role-edit-btn:hover { color: var(--accent); background: rgba(79,140,255,0.1); }
+  .role-edit-btn:hover { color: var(--accent-hover); background: rgba(28,92,170,0.12); }
   .role-del-btn { color: var(--text3); }
-  .role-del-btn:hover { color: var(--red); background: rgba(239,68,68,0.1); }
+  .role-del-btn:hover { color: var(--red); background: rgba(200,40,30,0.10); }
 
   /* ============================
      ANIMATIONS
@@ -707,7 +715,7 @@
     from { transform: translateY(100%); opacity: 0.9; }
     to   { transform: translateY(0);    opacity: 1; }
   }
-  @keyframes pulse-border { 0%,100%{box-shadow:0 0 0 0 rgba(79,140,255,0.4)} 50%{box-shadow:0 0 0 4px rgba(79,140,255,0)} }
+  @keyframes pulse-border { 0%,100%{box-shadow:0 0 0 0 rgba(28,92,170,0.4)} 50%{box-shadow:0 0 0 4px rgba(28,92,170,0)} }
 
   .pulse { animation: pulse-border 0.5s ease; }
 
@@ -750,7 +758,7 @@
     align-items: center; justify-content: center; flex-shrink: 0;
   }
   #intel-toggle:hover { background: var(--surface3); color: var(--text); border-color: var(--accent); }
-  #intel-toggle.active { background: rgba(79,140,255,0.12); border-color: var(--accent); color: var(--accent); }
+  #intel-toggle.active { background: rgba(28,92,170,0.18); border-color: var(--accent); color: var(--accent-hover); }
 
   /* ============================
      MOBILE BOTTOM NAV
@@ -758,7 +766,7 @@
   #mobile-nav {
     display: none;
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
-    background: rgba(8,9,11,0.97);
+    background: rgba(7,17,30,0.97);
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--border);
     height: var(--mobile-nav-h);
@@ -775,7 +783,7 @@
     -webkit-tap-highlight-color: transparent; user-select: none;
   }
   .mobile-nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .mobile-nav-item.active { color: var(--accent); }
+  .mobile-nav-item.active { color: var(--accent-hover); }
   .mobile-nav-item:active { transform: scale(0.93); }
 
   .mobile-nav-fab {
@@ -786,10 +794,10 @@
     width: 46px; height: 46px; background: var(--accent); border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
     font-size: 22px; color: white; font-weight: 700;
-    box-shadow: 0 4px 20px rgba(79,140,255,0.4);
+    box-shadow: 0 4px 20px rgba(28,92,170,0.5);
     transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
   }
-  .mobile-nav-fab:active .mobile-nav-fab-btn { transform: scale(0.93); box-shadow: 0 2px 10px rgba(79,140,255,0.3); }
+  .mobile-nav-fab:active .mobile-nav-fab-btn { transform: scale(0.93); box-shadow: 0 2px 10px rgba(28,92,170,0.3); }
 
   /* Right panel overlay */
   #right-panel-overlay {
@@ -1084,9 +1092,9 @@
   <div class="header-top">
     <button id="sb-toggle" onclick="toggleMobileSidebar()" title="Menu" aria-label="Menu">☰</button>
     <div class="logo">
-      <img src="LOGO.png" alt="Kneuralabs" class="logo-img"/>
-      <span class="logo-full">KNEURALABS<span> // </span>CMD</span>
-      <span class="logo-short">KNL<span> // </span>CMD</span>
+      <img src="LOGO.png" alt="Kneuralabs logo" class="logo-img"/>
+      <span class="logo-full">KNEURALABS<span style="color:var(--text3)"> // </span>CMD</span>
+      <span class="logo-short">KNL<span style="color:var(--text3)"> // </span>CMD</span>
     </div>
     <div class="header-date" id="header-date"></div>
     <div class="header-actions">
@@ -1147,7 +1155,7 @@
           <div class="section-title" style="margin:0">Projects <span class="count-badge" id="project-count">0</span></div>
           <div style="display:flex;gap:6px">
             <button class="btn btn-ghost" onclick="openArchiveModal()" id="view-archived-btn" style="font-size:11px;padding:7px 12px;display:none" title="View archived projects">📦 Archived</button>
-            <button class="btn btn-ghost" onclick="deleteAllProjects()" id="delete-all-projects-btn" style="font-size:11px;padding:7px 12px;color:var(--red);border-color:rgba(239,68,68,0.25)" title="Delete all projects">🗑 Delete All</button>
+            <button class="btn btn-ghost" onclick="deleteAllProjects()" id="delete-all-projects-btn" style="font-size:11px;padding:7px 12px;color:var(--red);border-color:rgba(200,40,30,0.25)" title="Delete all projects">🗑 Delete All</button>
             <button class="btn btn-primary" onclick="openProjectModal()" style="font-size:11px;padding:7px 14px;">+ New Project</button>
           </div>
         </div>
@@ -1335,7 +1343,7 @@
     </div>
 
     <!-- Danger zone — only shown when editing an existing project -->
-    <div id="project-danger-zone" style="display:none;margin-top:20px;padding-top:16px;border-top:1px solid rgba(239,68,68,0.2)">
+    <div id="project-danger-zone" style="display:none;margin-top:20px;padding-top:16px;border-top:1px solid rgba(200,40,30,0.2)">
       <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);opacity:0.7;margin-bottom:12px">Danger Zone</div>
 
       <!-- Task reassign row — shown only when project has linked tasks -->
@@ -1353,7 +1361,7 @@
           📦 Archive Project
         </button>
         <button class="btn" onclick="deleteCurrentProject(true)"
-          style="flex:1;background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.3)">
+          style="flex:1;background:rgba(200,40,30,0.12);color:var(--red);border:1px solid rgba(200,40,30,0.3)">
           🗑 Delete Permanently
         </button>
       </div>
@@ -1798,14 +1806,14 @@ function toggleTheme() {
   const isLight = document.body.classList.toggle('light');
   localStorage.setItem('theme', isLight ? 'light' : 'dark');
   document.getElementById('theme-toggle').textContent = isLight ? '☀️' : '🌙';
-  document.querySelector('meta[name="theme-color"]').content = isLight ? '#f5f6fa' : '#0a0b0d';
+  document.querySelector('meta[name="theme-color"]').content = isLight ? '#f7f8fa' : '#07111e';
 }
 (function initTheme() {
   if (localStorage.getItem('theme') === 'light') {
     document.body.classList.add('light');
     const btn = document.getElementById('theme-toggle');
     if (btn) btn.textContent = '☀️';
-    document.querySelector('meta[name="theme-color"]').content = '#f5f6fa';
+    document.querySelector('meta[name="theme-color"]').content = '#f7f8fa';
   }
 })();
 
@@ -2679,8 +2687,8 @@ function closeModal(id) { document.getElementById(id).style.display='none'; }
 
 // ==================== ROLE MANAGEMENT ====================
 const ROLE_COLORS = [
-  '#4f8cff','#06b6d4','#22c55e','#a855f7','#f59e0b',
-  '#f97316','#ef4444','#ec4899','#14b8a6','#8b5cf6',
+  '#1c5caa','#4a8bc8','#22c55e','#a855f7','#f59e0b',
+  '#f97316','#c8281e','#ec4899','#14b8a6','#8b5cf6',
   '#64748b','#84cc16','#e879f9','#38bdf8','#fb923c',
   '#8b909e',
 ];
@@ -2690,7 +2698,7 @@ function getRoleColor(r) {
   if (!S.roleColors) S.roleColors = {};
   if (S.roleColors[r]) return S.roleColors[r];
   // Default colors for built-in roles
-  const defaults = {CEO:'#4f8cff',COO:'#06b6d4',CFO:'#22c55e',CMO:'#a855f7',CIO:'#f59e0b'};
+  const defaults = {CEO:'#1c5caa',COO:'#4a8bc8',CFO:'#22c55e',CMO:'#a855f7',CIO:'#f59e0b'};
   return defaults[r] || '#8b909e';
 }
 
@@ -2943,7 +2951,7 @@ function buildEmailSnapshot() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   const timeStr = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
-  const subject = `Kneuralabs Command Center — ${now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+  const subject = `KneuraCOMM™ — Command Centre — ${now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
   const tasks = S.tasks, projects = S.projects, payments = S.payments, decisions = S.decisions;
   const totalTasks = tasks.length, doneTasks = tasks.filter(t=>t.status==='done').length;
   const inProgTasks = tasks.filter(t=>t.status==='in-progress').length;
@@ -2952,9 +2960,9 @@ function buildEmailSnapshot() {
   const pendPay = payments.filter(p=>p.status==='pending').reduce((s,p)=>s+Number(p.amount),0);
   const recvPay = payments.filter(p=>p.status==='received').reduce((s,p)=>s+Number(p.amount),0);
   const completionRate = totalTasks ? Math.round(doneTasks/totalTasks*100) : 0;
-  const pCol = { high:'#ef4444', medium:'#f59e0b', low:'#8b909e' };
-  const sCol = { pending:'#8b909e', 'in-progress':'#4f8cff', blocked:'#f97316', done:'#22c55e', overdue:'#ef4444' };
-  const sBg  = { pending:'#1e2229', 'in-progress':'rgba(79,140,255,0.12)', blocked:'rgba(249,115,22,0.12)', done:'rgba(34,197,94,0.10)', overdue:'rgba(239,68,68,0.12)' };
+  const pCol = { high:'#c8281e', medium:'#f59e0b', low:'#8b909e' };
+  const sCol = { pending:'#8b909e', 'in-progress':'#1c5caa', blocked:'#f97316', done:'#22c55e', overdue:'#c8281e' };
+  const sBg  = { pending:'#1a3a62', 'in-progress':'rgba(28,92,170,0.15)', blocked:'rgba(249,115,22,0.12)', done:'rgba(34,197,94,0.10)', overdue:'rgba(200,40,30,0.12)' };
   const overdueList = tasks.filter(t=>isOverdue(t));
   const blockedList = tasks.filter(t=>!isOverdue(t)&&t.status==='blocked');
   const activeList  = tasks.filter(t=>!isOverdue(t)&&t.status!=='blocked'&&t.status!=='done');
@@ -2967,8 +2975,8 @@ function buildEmailSnapshot() {
       const stDisplay = (isOverdue(t) && t.status!=='done') ? 'overdue' : t.status;
       const du = t.due ? daysUntil(t.due) : null;
       const duLabel = t.due ? (isOverdue(t) ? `${Math.abs(du)}d overdue` : du===0?'Today':du===1?'Tomorrow':`${du}d`) : '—';
-      const duColor = isOverdue(t)?'#ef4444': isDueSoon(t)?'#f59e0b':'#6b7280';
-      return `<tr style="border-bottom:1px solid #1e2229">
+      const duColor = isOverdue(t)?'#c8281e': isDueSoon(t)?'#f59e0b':'#6b7280';
+      return `<tr style="border-bottom:1px solid #1a3a62">
         <td style="padding:11px 16px;vertical-align:middle">
           <div style="display:flex;align-items:center;gap:8px">
             <span style="display:inline-block;width:3px;height:28px;border-radius:2px;background:${pCol[t.priority]||'#555'};flex-shrink:0"></span>
@@ -2978,9 +2986,9 @@ function buildEmailSnapshot() {
             </div>
           </div>
         </td>
-        <td style="padding:11px 12px;vertical-align:middle;white-space:nowrap"><span style="font-size:11px;font-weight:600;color:#06b6d4;background:rgba(6,182,212,0.1);padding:2px 7px;border-radius:4px">${t.role}</span></td>
+        <td style="padding:11px 12px;vertical-align:middle;white-space:nowrap"><span style="font-size:11px;font-weight:600;color:#4a8bc8;background:rgba(74,139,200,0.12);padding:2px 7px;border-radius:4px">${t.role}</span></td>
         <td style="padding:11px 12px;vertical-align:middle;white-space:nowrap">${proj?`<span style="font-size:11px;color:#a855f7;background:rgba(168,85,247,0.1);padding:2px 7px;border-radius:4px">${esc(proj.name)}</span>`:`<span style="color:#374151;font-size:11px">—</span>`}</td>
-        <td style="padding:11px 12px;vertical-align:middle;text-align:center"><span style="font-size:11px;font-weight:600;color:${sCol[stDisplay]||'#8b909e'};background:${sBg[stDisplay]||'#1e2229'};padding:3px 8px;border-radius:4px;white-space:nowrap">${stDisplay.replace('-',' ')}</span></td>
+        <td style="padding:11px 12px;vertical-align:middle;text-align:center"><span style="font-size:11px;font-weight:600;color:${sCol[stDisplay]||'#8b909e'};background:${sBg[stDisplay]||'#1a3a62'};padding:3px 8px;border-radius:4px;white-space:nowrap">${stDisplay.replace('-',' ')}</span></td>
         <td style="padding:11px 12px;vertical-align:middle;text-align:right;white-space:nowrap;font-size:12px;color:${duColor}">${duLabel}</td>
       </tr>`;
     }).join('');
@@ -2991,10 +2999,10 @@ function buildEmailSnapshot() {
     return `<div style="margin-bottom:28px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <span style="font-size:13px;font-weight:700;color:${accentColor};text-transform:uppercase;letter-spacing:0.06em">${label}</span>
-        <span style="font-size:12px;color:#4b5563;background:#1e2229;padding:1px 8px;border-radius:4px;font-weight:500">${arr.length}</span>
+        <span style="font-size:12px;color:#4b5563;background:#1a3a62;padding:1px 8px;border-radius:4px;font-weight:500">${arr.length}</span>
       </div>
-      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #1e2229;border-radius:8px;overflow:hidden">
-        <thead><tr style="background:#111318">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #1a3a62;border-radius:8px;overflow:hidden">
+        <thead><tr style="background:#0a1929">
           <th style="padding:9px 16px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Task</th>
           <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Role</th>
           <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Project</th>
@@ -3014,25 +3022,25 @@ function buildEmailSnapshot() {
       const blk  = ts.filter(t=>t.status==='blocked').length;
       const ovd  = ts.filter(t=>isOverdue(t)).length;
       const pct  = ts.length ? Math.round(done/ts.length*100) : 0;
-      return `<tr style="border-bottom:1px solid #1e2229">
+      return `<tr style="border-bottom:1px solid #1a3a62">
         <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#e8eaf0">${esc(p.name)}</td>
-        <td style="padding:12px 12px;font-size:12px;color:#06b6d4">${p.role}</td>
+        <td style="padding:12px 12px;font-size:12px;color:#4a8bc8">${p.role}</td>
         <td style="padding:12px 16px;min-width:140px">
           <div style="display:flex;align-items:center;gap:8px">
-            <div style="flex:1;background:#1e2229;border-radius:3px;height:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#22c55e;border-radius:3px"></div></div>
+            <div style="flex:1;background:#1a3a62;border-radius:3px;height:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#22c55e;border-radius:3px"></div></div>
             <span style="font-size:12px;color:#22c55e;font-weight:600;white-space:nowrap">${pct}%</span>
           </div>
         </td>
         <td style="padding:12px 12px;text-align:center;font-size:12px;color:#e8eaf0">${ts.length}</td>
         <td style="padding:12px 12px;text-align:center;font-size:12px;color:#22c55e">${done}</td>
         <td style="padding:12px 12px;text-align:center;font-size:12px;color:${blk?'#f97316':'#4b5563'}">${blk}</td>
-        <td style="padding:12px 12px;text-align:center;font-size:12px;color:${ovd?'#ef4444':'#4b5563'}">${ovd}</td>
+        <td style="padding:12px 12px;text-align:center;font-size:12px;color:${ovd?'#c8281e':'#4b5563'}">${ovd}</td>
       </tr>`;
     }).join('');
     return `<div style="margin-bottom:28px">
       <div style="font-size:13px;font-weight:700;color:#8b909e;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Projects</div>
-      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #1e2229;border-radius:8px;overflow:hidden">
-        <thead><tr style="background:#111318">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #1a3a62;border-radius:8px;overflow:hidden">
+        <thead><tr style="background:#0a1929">
           <th style="padding:9px 16px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Project</th>
           <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Owner</th>
           <th style="padding:9px 16px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Progress</th>
@@ -3051,7 +3059,7 @@ function buildEmailSnapshot() {
     const rows = payments.map(p => {
       const col = p.status==='received'?'#22c55e':'#f59e0b';
       const bg  = p.status==='received'?'rgba(34,197,94,0.1)':'rgba(245,158,11,0.1)';
-      return `<tr style="border-bottom:1px solid #1e2229">
+      return `<tr style="border-bottom:1px solid #1a3a62">
         <td style="padding:11px 16px;font-size:13px;font-weight:600;color:#e8eaf0">${esc(p.client)}</td>
         <td style="padding:11px 12px;font-size:14px;font-weight:700;color:#e8eaf0">₹${Number(p.amount).toLocaleString()}</td>
         <td style="padding:11px 12px;font-size:12px;color:#6b7280">${p.due||'—'}</td>
@@ -3060,8 +3068,8 @@ function buildEmailSnapshot() {
     }).join('');
     return `<div style="margin-bottom:28px">
       <div style="font-size:13px;font-weight:700;color:#8b909e;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Payments</div>
-      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #1e2229;border-radius:8px;overflow:hidden">
-        <thead><tr style="background:#111318">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #1a3a62;border-radius:8px;overflow:hidden">
+        <thead><tr style="background:#0a1929">
           <th style="padding:9px 16px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Client</th>
           <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Amount</th>
           <th style="padding:9px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.07em">Due</th>
@@ -3069,7 +3077,7 @@ function buildEmailSnapshot() {
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
-      <div style="margin-top:10px;display:flex;gap:20px;padding:10px 16px;background:#111318;border-radius:6px;border:1px solid #1e2229">
+      <div style="margin-top:10px;display:flex;gap:20px;padding:10px 16px;background:#0a1929;border-radius:6px;border:1px solid #1a3a62">
         <div><span style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.06em">Pending</span><br><span style="font-size:15px;font-weight:700;color:#f59e0b">₹${pendPay.toLocaleString()}</span></div>
         <div><span style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.06em">Received</span><br><span style="font-size:15px;font-weight:700;color:#22c55e">₹${recvPay.toLocaleString()}</span></div>
       </div>
@@ -3079,7 +3087,7 @@ function buildEmailSnapshot() {
   function decisionsSection() {
     if (!decisions.length) return '';
     const items = [...decisions].reverse().map(d =>
-      `<div style="border-left:3px solid #2e333d;padding:10px 16px;margin-bottom:8px;background:#111318;border-radius:0 6px 6px 0">
+      `<div style="border-left:3px solid #1c5caa;padding:10px 16px;margin-bottom:8px;background:#0a1929;border-radius:0 6px 6px 0">
         <div style="font-size:11px;color:#4b5563;margin-bottom:4px;font-family:monospace">${d.ts||''}</div>
         <div style="font-size:13px;color:#9ca3af;line-height:1.6">${esc(d.note||d.text||d)}</div>
       </div>`
@@ -3094,41 +3102,41 @@ function buildEmailSnapshot() {
   const emailRevLabel = S.revenueAuto ? 'Revenue (auto)' : 'Revenue';
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<style>* { box-sizing:border-box; margin:0; padding:0; } body { background:#0a0b0d; color:#e8eaf0; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; } a { color:#4f8cff; }</style>
+<style>* { box-sizing:border-box; margin:0; padding:0; } body { background:#07111e; color:#e8eaf0; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; } a { color:#1c5caa; }</style>
 </head><body>
-<div style="max-width:700px;margin:0 auto;background:#0a0b0d;padding:32px 24px 48px">
-  <div style="border-bottom:1px solid #1e2229;padding-bottom:20px;margin-bottom:28px">
+<div style="max-width:700px;margin:0 auto;background:#07111e;padding:32px 24px 48px">
+  <div style="border-bottom:1px solid #1a3a62;padding-bottom:20px;margin-bottom:28px">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
       <div>
-        <div style="font-size:11px;font-weight:700;color:#4f8cff;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:6px">Kneuralabs</div>
-        <div style="font-size:24px;font-weight:800;color:#e8eaf0;letter-spacing:-0.02em">Command Center</div>
+        <div style="font-size:11px;font-weight:700;color:#1c5caa;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:6px">Kneuralabs</div>
+        <div style="font-size:24px;font-weight:800;color:#f7f8fa;letter-spacing:-0.02em">Command Centre</div>
         <div style="font-size:12px;color:#6b7280;margin-top:5px">${dateStr} &nbsp;·&nbsp; ${timeStr}</div>
       </div>
       <div style="text-align:right">
         <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">Completion</div>
-        <div style="font-size:32px;font-weight:800;color:${completionRate>=70?'#22c55e':completionRate>=40?'#f59e0b':'#ef4444'}">${completionRate}%</div>
+        <div style="font-size:32px;font-weight:800;color:${completionRate>=70?'#22c55e':completionRate>=40?'#f59e0b':'#c8281e'}">${completionRate}%</div>
         <div style="font-size:11px;color:#4b5563">${doneTasks} of ${totalTasks} tasks done</div>
       </div>
     </div>
   </div>
-  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;border:1px solid #1e2229;border-radius:10px;overflow:hidden">
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;border:1px solid #1a3a62;border-radius:10px;overflow:hidden">
     <tr>
-      <td style="padding:16px 0;text-align:center;border-right:1px solid #1e2229"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">${emailRevLabel}</div><div style="font-size:22px;font-weight:800;color:#22c55e">₹${emailRev.toLocaleString()}</div></td>
-      <td style="padding:16px 0;text-align:center;border-right:1px solid #1e2229"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">In Progress</div><div style="font-size:22px;font-weight:800;color:#4f8cff">${inProgTasks}</div></td>
-      <td style="padding:16px 0;text-align:center;border-right:1px solid #1e2229"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">Blocked</div><div style="font-size:22px;font-weight:800;color:#f97316">${blockedTasks}</div></td>
-      <td style="padding:16px 0;text-align:center;border-right:1px solid #1e2229"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">Overdue</div><div style="font-size:22px;font-weight:800;color:#ef4444">${overdueTasks}</div></td>
+      <td style="padding:16px 0;text-align:center;border-right:1px solid #1a3a62"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">${emailRevLabel}</div><div style="font-size:22px;font-weight:800;color:#22c55e">₹${emailRev.toLocaleString()}</div></td>
+      <td style="padding:16px 0;text-align:center;border-right:1px solid #1a3a62"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">In Progress</div><div style="font-size:22px;font-weight:800;color:#1c5caa">${inProgTasks}</div></td>
+      <td style="padding:16px 0;text-align:center;border-right:1px solid #1a3a62"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">Blocked</div><div style="font-size:22px;font-weight:800;color:#f97316">${blockedTasks}</div></td>
+      <td style="padding:16px 0;text-align:center;border-right:1px solid #1a3a62"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">Overdue</div><div style="font-size:22px;font-weight:800;color:#c8281e">${overdueTasks}</div></td>
       <td style="padding:16px 0;text-align:center"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:5px">Pending Pay</div><div style="font-size:22px;font-weight:800;color:#f59e0b">₹${pendPay.toLocaleString()}</div></td>
     </tr>
   </table>
-  ${taskSection('🔴 Overdue', overdueList, '#ef4444')}
+  ${taskSection('🔴 Overdue', overdueList, '#c8281e')}
   ${taskSection('🟠 Blocked', blockedList, '#f97316')}
   ${taskSection('Active Tasks', activeList, '#9ca3af')}
   ${taskSection('✓ Done', doneList, '#22c55e')}
   ${projectSection()}
   ${paymentsSection()}
   ${decisionsSection()}
-  <div style="border-top:1px solid #1e2229;padding-top:20px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-    <div style="font-size:12px;color:#374151">Generated by <span style="color:#4f8cff;font-weight:600">Kneuralabs Command Center</span></div>
+  <div style="border-top:1px solid #1a3a62;padding-top:20px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div style="font-size:12px;color:#374151">Generated by <span style="color:#1c5caa;font-weight:600">KneuraCOMM™ — Command Centre</span></div>
     <div style="font-size:11px;color:#374151;font-family:monospace">${now.toISOString()}</div>
   </div>
 </div></body></html>`;
@@ -3146,7 +3154,7 @@ function buildEmailSnapshot() {
     payments.length    ? `\nPAYMENTS\n${payments.map(p=>`  ${p.client}: ₹${Number(p.amount).toLocaleString()} — ${p.status}${p.due?' — Due: '+p.due:''}`).join('\n')}` : '',
     decisions.length   ? `\nDECISION LOG\n${[...decisions].reverse().map(d=>`  [${d.ts||''}] ${d.note||d.text||d}`).join('\n')}` : '',
     '',
-    `— Kneuralabs Command Center`,
+    `— KneuraCOMM™ — Command Centre`,
   ].filter(s=>s!=='').join('\n');
 
   return { html, plain, subject };

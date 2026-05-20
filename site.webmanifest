@@ -1,13 +1,13 @@
 {
-  "name": "KneuraCOMM™ - Command Center",
+  "name": "KneuraCOMM™ — Command Centre",
   "short_name": "KneuraCOMM",
-  "description": "Manage tasks, projects, payments, and decisions for your team in one place.",
+  "description": "Command centre for AI governance leaders — tasks, projects, decisions, and payments.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0a0b0d",
-  "theme_color": "#0a0b0d",
+  "background_color": "#07111e",
+  "theme_color": "#1c5caa",
   "icons": [
     { "src": "favicon-32.png", "sizes": "32x32", "type": "image/png" },
     { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
