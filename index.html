@@ -32,9 +32,9 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'" />
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" /></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600&display=swap" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600&display=swap" /></noscript>
 <!-- SheetJS for Excel processing -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js" defer></script>
 <style>
@@ -61,7 +61,7 @@
     --silver: #d0d2d6;      /* Structural Silver */
     --mono: 'Inter', 'Aptos Display', sans-serif;
     --sans: 'Inter', 'Aptos Display', sans-serif;
-    --header-h: 111px;
+    --header-h: 110px;
     --mobile-nav-h: 60px;
     --radius: 10px;
     --radius-sm: 6px;
@@ -875,7 +875,7 @@
   @media (max-width: 1023px) and (min-width: 768px) {
     html { font-size: 16px; }
     .header-top { height: 48px; padding: 0 16px; gap: 8px; }
-    :root { --header-h: 107px; }
+    :root { --header-h: 110px; }
     .logo-full { display: none; }
     .logo-short { display: inline; }
     #save-btn-label { display: none; }
@@ -889,7 +889,7 @@
 
   /* ── TABLET PORTRAIT landscape override ── */
   @media (max-width: 1023px) and (min-width: 768px) and (orientation: landscape) {
-    :root { --header-h: 91px; }
+    :root { --header-h: 110px; }
     .header-top { height: 41px; padding: 0 14px; gap: 7px; }
     .header-metrics { height: 50px; }
     .metric-value { font-size: 18px; }
@@ -900,12 +900,13 @@
   /* ── LARGE PHONE LANDSCAPE / SMALL TABLET 600–767px ── */
   @media (max-width: 767px) and (min-width: 600px) {
     html { font-size: 15.5px; }
-    :root { --header-h: 98px; }
+    :root { --header-h: 110px; }
     .header-top { height: 46px; padding: 0 14px; gap: 8px; }
     .logo-full { display: none; }
     .logo-short { display: inline; }
     #save-btn-label { display: none; }
     .header-date { display: none; }
+    #sb-toggle { display: flex; }
     #sidebar { width: 185px; }
     .metric-pill { padding: 0 11px; }
     .metric-value { font-size: 18px; }
@@ -917,7 +918,7 @@
   /* ── PHONE PORTRAIT 400–599px ── */
   @media (max-width: 599px) {
     html { font-size: 15px; }
-    :root { --header-h: 98px; }
+    :root { --header-h: 84px; }
 
     /* Bottom nav visible, sidebar overlays */
     #mobile-nav { display: flex; flex-direction: column; }
@@ -1012,12 +1013,11 @@
   /* ── SMALL PHONE <400px ── */
   @media (max-width: 399px) {
     html { font-size: 14px; }
-    :root { --header-h: 94px; }
+    :root { --header-h: 84px; }
     .metric-pill { padding: 0 8px; }
     .metric-value { font-size: 16px; }
     .metric-label { font-size: 9px; }
     .header-top { padding: 0 8px; gap: 4px; }
-    :root { --header-h: 94px; }
     .logo-full { display: none; }
     .logo-short { display: inline; }
     .logo { font-size: 13px; }
@@ -1071,6 +1071,246 @@
   @media (max-width: 599px) {
     #email-modal-box { border-radius: 20px 20px 0 0; max-height: 95vh; }
   }
+
+  /* ── Kneuralabs Chrome Variables ── */
+  :root {
+    --kn-bg:   #0B0C0F;
+    --kn-bg2:  #14161a;
+    --kn-line: rgba(255,255,255,0.10);
+    --kn-text: #f5f1e8;
+    --kn-dim:  rgba(245,241,232,0.55);
+    --kn-faint:rgba(245,241,232,0.32);
+    --kn-amber:#d97706;
+  }
+
+  /* ── Kneuralabs Header ── */
+  #header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--kn-bg);
+    color: var(--kn-text);
+    border-bottom: 1px solid var(--kn-line);
+    font-family: var(--sans);
+    height: var(--header-h);
+    display: flex; flex-direction: column;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    animation: fadeIn 0.4s ease both;
+  }
+  body.light #header { background: var(--kn-bg); border-bottom-color: var(--kn-line); }
+
+  .kn-eyebrow {
+    height: 26px; flex: 0 0 26px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--kn-line);
+    font-size: 11px; letter-spacing: 0.04em;
+    color: var(--kn-dim);
+    background: linear-gradient(to right, rgba(217,119,6,0.07), transparent 40%);
+    white-space: nowrap; overflow: hidden;
+  }
+  .kn-eyebrow-dot { color: var(--kn-amber); font-size: 8px; flex-shrink: 0; }
+  .kn-eyebrow-faint { color: var(--kn-faint); }
+  #header-date { margin-left: auto; }
+
+  .kn-hdr-bar {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 16px;
+    overflow: hidden;
+  }
+
+  .kn-brand {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--kn-text);
+    font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+    flex-shrink: 0;
+  }
+  .kn-brand .logo-img {
+    height: 22px; width: 22px; border-radius: 4px; flex-shrink: 0;
+    filter: brightness(0) invert(1);
+  }
+  .kn-brand-word { display: flex; align-items: baseline; }
+  .kn-brand-word i { font-style: italic; font-weight: 400; color: var(--kn-dim); }
+  .kn-brand-sep { color: var(--kn-faint); font-weight: 300; margin: 0 3px; }
+  .kn-brand-product {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+    padding: 3px 7px;
+    border: 1px solid var(--kn-line); border-radius: 3px;
+    color: var(--kn-text); background: rgba(255,255,255,0.04);
+  }
+
+  .kn-nav { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
+  .kn-nav-link {
+    display: flex; align-items: center; gap: 5px;
+    padding: 7px 10px;
+    color: var(--kn-dim); text-decoration: none;
+    font-size: 12.5px; font-weight: 500;
+    border-radius: 4px; transition: color .15s, background .15s;
+    position: relative; cursor: pointer; user-select: none;
+    border: none; background: transparent; font-family: var(--sans);
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .kn-nav-link:hover { color: var(--kn-text); background: rgba(255,255,255,0.04); }
+  .kn-nav-link.is-active { color: var(--kn-text); }
+  .kn-nav-link.is-active::after {
+    content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px;
+    height: 2px; background: var(--kn-amber);
+  }
+  .kn-nav-num {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--kn-faint);
+  }
+  .kn-nav-link.is-active .kn-nav-num { color: var(--kn-amber); }
+
+  .kn-hdr-right { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .kn-pill {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.04em;
+    padding: 3px 8px; border: 1px solid var(--kn-line);
+    border-radius: 999px; color: var(--kn-dim); white-space: nowrap;
+  }
+
+  /* Override existing btn-icon / btn-save styles inside header */
+  .kn-hdr-right .btn-icon,
+  .kn-hdr-right .btn-save {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--kn-line);
+    color: var(--kn-dim);
+  }
+  .kn-hdr-right .btn-icon:hover,
+  .kn-hdr-right .btn-save:hover {
+    background: rgba(255,255,255,0.10);
+    color: var(--kn-text);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .kn-hdr-right .btn-save.just-saved {
+    background: rgba(74,222,128,0.15);
+    border-color: rgba(74,222,128,0.4);
+    color: #4ade80;
+  }
+  #intel-toggle {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--kn-line);
+    color: var(--kn-dim);
+    border-radius: var(--radius-sm);
+    width: 36px; height: 36px;
+    cursor: pointer; font-size: 14px; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  #intel-toggle:hover { background: rgba(255,255,255,0.10); color: var(--kn-text); border-color: rgba(255,255,255,0.2); }
+  #intel-toggle.active { background: rgba(217,119,6,0.18); border-color: var(--kn-amber); color: var(--kn-amber); }
+
+  /* ── Bloomberg Ticker ── */
+  .kn-ticker {
+    flex: 0 0 22px; height: 22px;
+    overflow: hidden; position: relative;
+    border-top: 1px solid var(--kn-line);
+    background: var(--kn-bg2); color: var(--kn-text);
+    font-size: 10px; font-weight: 600; letter-spacing: 0.03em;
+    display: flex; align-items: center;
+  }
+  .kn-ticker::before {
+    content: 'COMM';
+    flex-shrink: 0;
+    padding: 0 10px;
+    font-size: 9px; font-weight: 800; letter-spacing: 0.15em;
+    color: var(--kn-amber);
+    border-right: 1px solid var(--kn-line);
+    height: 100%; display: flex; align-items: center;
+  }
+  .kn-ticker-inner {
+    white-space: nowrap; padding-left: 16px;
+    animation: kn-ticker-scroll 55s linear infinite;
+  }
+  @keyframes kn-ticker-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* Override sb-toggle for dark header */
+  #sb-toggle {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--kn-line);
+    color: var(--kn-dim);
+  }
+  #sb-toggle:hover { background: rgba(255,255,255,0.10); color: var(--kn-text); }
+
+  /* ── Kneuralabs Footer ── */
+  #kn-footer {
+    background: var(--kn-bg);
+    color: var(--kn-text);
+    border-top: 1px solid var(--kn-line);
+    font-family: var(--sans);
+  }
+  .kn-ftr-grid {
+    display: grid; grid-template-columns: 1.6fr 1fr 1.2fr 1.2fr;
+    gap: 32px; padding: 24px 24px 16px;
+  }
+  .kn-ftr-col { display: flex; flex-direction: column; gap: 5px; }
+  .kn-ftr-col a {
+    color: var(--kn-dim); text-decoration: none;
+    font-size: 12.5px; line-height: 1.5; cursor: pointer;
+    transition: color .15s;
+  }
+  .kn-ftr-col a:hover { color: var(--kn-text); }
+  .kn-ftr-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--kn-faint); margin-bottom: 3px;
+  }
+  .kn-ftr-logo {
+    font-size: 18px; font-weight: 700; letter-spacing: -0.015em;
+    color: var(--kn-text); margin-bottom: 3px;
+  }
+  .kn-ftr-logo i { font-style: italic; font-weight: 400; color: var(--kn-dim); }
+  .kn-ftr-tagline { font-size: 13px; line-height: 1.45; color: var(--kn-dim); max-width: 280px; margin: 0; }
+  .kn-ftr-tagline i { color: var(--kn-amber); font-style: italic; font-weight: 500; }
+  .kn-ftr-tags { display: flex; gap: 5px; font-size: 10.5px; color: var(--kn-faint); margin-top: 5px; }
+  .kn-ftr-base {
+    border-top: 1px solid var(--kn-line); padding: 10px 24px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 10.5px; letter-spacing: 0.02em; color: var(--kn-faint);
+  }
+  .kn-ftr-spacer { flex: 1; }
+  .kn-ftr-status { display: flex; align-items: center; gap: 7px; color: var(--kn-dim); }
+  .kn-ftr-led {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4ade80; box-shadow: 0 0 7px rgba(74,222,128,0.6);
+    animation: kn-led-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes kn-led-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── Responsive Chrome ── */
+  @media (min-width: 1920px) {
+    /* Keep header at 110px on large screens (override old 118px rule) */
+    :root { --header-h: 110px; }
+  }
+  @media (max-width: 1100px) {
+    .kn-pill { display: none; }
+  }
+  @media (max-width: 880px) {
+    .kn-ftr-grid { grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 16px 12px; }
+    .kn-nav-num { display: none; }
+  }
+  @media (max-width: 767px) {
+    /* Hide nav links; eyebrow + bar + ticker still = 110px */
+    .kn-nav { display: none; }
+    :root { --header-h: 110px; }
+  }
+  @media (max-width: 599px) {
+    /* Eyebrow hidden → bar (62) + ticker (22) = 84px */
+    .kn-eyebrow { display: none; }
+    :root { --header-h: 84px; }
+    .kn-ftr-grid { grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 14px 10px; }
+  }
+  @media (max-width: 480px) {
+    .kn-ftr-grid { grid-template-columns: 1fr; gap: 14px; }
+  }
+  @media (max-width: 812px) and (orientation: landscape) and (max-height: 500px) {
+    /* Landscape phone: eyebrow + ticker hidden → just bar = 52px */
+    .kn-eyebrow { display: none; }
+    .kn-ticker  { display: none; }
+    :root { --header-h: 52px; }
+  }
 </style>
 </head>
 <body>
@@ -1090,18 +1330,38 @@
   </div>
 </div>
 
-<div id="header">
-  <div class="header-top">
+<header id="header">
+  <!-- eyebrow -->
+  <div class="kn-eyebrow">
+    <span>COMM · Command Centre · v0.4</span>
+    <span class="kn-eyebrow-dot">●</span>
+    <span class="kn-eyebrow-faint">a Kneuralabs product · 2026</span>
+    <span id="header-date" class="kn-eyebrow-faint"></span>
+  </div>
+  <!-- main bar -->
+  <div class="kn-hdr-bar">
     <button id="sb-toggle" onclick="toggleMobileSidebar()" title="Menu" aria-label="Menu">☰</button>
-    <div class="logo">
+
+    <a class="kn-brand" href="https://www.kneuralabs.com" target="_blank" rel="noopener">
       <img src="LOGO.png" alt="Kneuralabs logo" class="logo-img"/>
-      <span class="logo-full">KNEURALABS<span style="color:var(--text3)"> // </span>CMD</span>
-      <span class="logo-short">KNL<span style="color:var(--text3)"> // </span>CMD</span>
-    </div>
-    <div class="header-date" id="header-date"></div>
-    <div class="header-actions">
-      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" title="Toggle dark/light mode" aria-label="Toggle theme">🌙</button>
+      <span class="kn-brand-word">kneural<i>labs</i></span>
+      <span class="kn-brand-sep">/</span>
+      <span class="kn-brand-product">COMM</span>
+    </a>
+
+    <nav class="kn-nav" id="kn-nav">
+      <button class="kn-nav-link is-active" onclick="switchView('tasks')"><span class="kn-nav-num">01</span>Tasks</button>
+      <button class="kn-nav-link" onclick="switchView('projects')"><span class="kn-nav-num">02</span>Projects</button>
+      <button class="kn-nav-link" onclick="switchView('payments')"><span class="kn-nav-num">03</span>Payments</button>
+      <button class="kn-nav-link" onclick="switchView('decisions')"><span class="kn-nav-num">04</span>Decisions</button>
+      <button class="kn-nav-link" onclick="openRoleModal()"><span class="kn-nav-num">05</span>Roles</button>
+    </nav>
+
+    <div class="kn-hdr-right">
+      <span class="kn-pill">NIST AI RMF</span>
+      <span class="kn-pill">ISO/IEC 42001</span>
       <button id="intel-toggle" onclick="toggleIntelPanel()" title="Intel Panel">⚡</button>
+      <button id="theme-toggle" class="btn-icon" onclick="toggleTheme()" title="Toggle dark/light mode" aria-label="Toggle theme">🌙</button>
       <button id="save-btn" class="btn-save" onclick="manualSave()" title="Save (Ctrl+S)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         <span id="save-btn-label">Saved</span>
@@ -1110,8 +1370,11 @@
       <button class="btn-icon" onclick="openEmailPreview()" title="Email Snapshot">✉</button>
     </div>
   </div>
-  <div class="header-metrics" id="header-metrics"></div>
-</div>
+  <!-- Bloomberg ticker ribbon -->
+  <div class="kn-ticker">
+    <div class="kn-ticker-inner" id="kn-ticker-content">—</div>
+  </div>
+</header>
 
 <div id="sb-overlay" onclick="toggleMobileSidebar()"></div>
 <div id="right-panel-overlay" onclick="closeIntelPanel()"></div>
@@ -1248,6 +1511,51 @@
 </div>
 
 <div id="toast"></div>
+
+<!-- Kneuralabs Footer -->
+<footer id="kn-footer">
+  <div class="kn-ftr-grid">
+    <div class="kn-ftr-col">
+      <div class="kn-ftr-logo">kneural<i>labs</i></div>
+      <p class="kn-ftr-tagline">Structural AI <i>governance.</i> Not a feature you add later.</p>
+      <div class="kn-ftr-tags">
+        <span>NIST AI RMF</span><span>·</span><span>ISO/IEC 42001</span><span>·</span><span>EU AI Act</span>
+      </div>
+    </div>
+    <div class="kn-ftr-col">
+      <div class="kn-ftr-label">Comm</div>
+      <a onclick="switchView('tasks')">Tasks</a>
+      <a onclick="switchView('projects')">Projects</a>
+      <a onclick="switchView('payments')">Payments</a>
+      <a onclick="switchView('decisions')">Decisions</a>
+      <a onclick="openRoleModal()">Roles</a>
+    </div>
+    <div class="kn-ftr-col">
+      <div class="kn-ftr-label">Services</div>
+      <a href="https://www.kneuralabs.com" target="_blank" rel="noopener">S1 · AI Risk Assessment</a>
+      <a href="https://www.kneuralabs.com" target="_blank" rel="noopener">S2 · Governance Framework</a>
+      <a href="https://www.kneuralabs.com" target="_blank" rel="noopener">S3 · Standards Readiness</a>
+      <a href="https://www.kneuralabs.com" target="_blank" rel="noopener">S4 · IT Modernization</a>
+    </div>
+    <div class="kn-ftr-col">
+      <div class="kn-ftr-label">Contact</div>
+      <a href="mailto:hello@kneuralabs.com">hello@kneuralabs.com</a>
+      <a href="https://www.kneuralabs.com" target="_blank" rel="noopener">Book a 30-min discovery call</a>
+      <a href="https://x.com/kneuralabs" target="_blank" rel="noopener">@kneuralabs</a>
+      <a href="https://www.kneuralabs.com" target="_blank" rel="noopener">kneuralabs.com</a>
+    </div>
+  </div>
+  <div class="kn-ftr-base">
+    <span>© 2026 Kneuralabs LLC</span>
+    <span>·</span>
+    <span>AI Governance · U.S. Mid-Market</span>
+    <span class="kn-ftr-spacer"></span>
+    <span class="kn-ftr-status">
+      <span class="kn-ftr-led"></span>
+      <span>All systems nominal</span>
+    </span>
+  </div>
+</footer>
 
 <!-- ROLE MANAGEMENT MODAL -->
 <div class="overlay" id="role-modal" style="display:none" onclick="if(event.target===this)closeModal('role-modal')">
@@ -2054,7 +2362,9 @@ function toast(msg) {
 
 // ==================== HEADER ====================
 function renderDate() {
-  document.getElementById('header-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const d = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const el = document.getElementById('header-date');
+  if (el) el.textContent = d;
 }
 
 function renderMetrics() {
@@ -2071,46 +2381,25 @@ function renderMetrics() {
   const autoRev = S.payments.filter(p=>p.status==='received').reduce((s,p)=>s+Number(p.amount),0);
   const displayRev = S.revenueAuto ? autoRev : (S.revenue||0);
 
-  document.getElementById('header-metrics').innerHTML = `
-    <div class="metric-pill" title="${S.revenueAuto ? 'Revenue auto-calculated from received payments. Click toggle to switch to manual.' : 'Revenue is manually set. Click toggle to auto-calculate from received payments.'}">
-      <div class="metric-stack">
-        <div class="metric-label" style="display:flex;align-items:center;gap:5px">
-          Revenue
-          <button onclick="toggleRevenueMode()" title="${S.revenueAuto?'Switch to manual':'Switch to auto (sum of received payments)'}"
-            style="background:${S.revenueAuto?'rgba(34,197,94,0.18)':'var(--surface3)'};border:1px solid ${S.revenueAuto?'rgba(34,197,94,0.4)':'var(--border)'};
-            color:${S.revenueAuto?'var(--green)':'var(--text3)'};border-radius:3px;padding:1px 5px;font-size:8px;cursor:pointer;
-            font-family:var(--sans);font-weight:700;letter-spacing:0.04em;line-height:1.4;transition:all 0.15s">
-            ${S.revenueAuto?'AUTO':'MAN'}
-          </button>
-        </div>
-        ${S.revenueAuto
-          ? `<div class="metric-value green">₹${displayRev.toLocaleString()}</div><div class="metric-sub" style="font-size:9px;opacity:0.55">from payments</div>`
-          : `<div class="metric-value green"><input class="revenue-input" type="number" value="${S.revenue||0}" placeholder="0" oninput="S.revenue=+this.value;save();renderRightPanel()" title="Manual revenue — click to edit" style="cursor:text"></div><div class="metric-sub" style="font-size:9px;opacity:0.55">click to edit</div>`
-        }
-      </div>
-    </div>
-    <div class="metric-pill clickable" onclick="setStatusFilter('pending')">
-      <div class="metric-stack"><div class="metric-label">Pending</div><div class="metric-value">${pending}</div></div>
-    </div>
-    <div class="metric-pill clickable" onclick="setStatusFilter('in-progress')">
-      <div class="metric-stack"><div class="metric-label">In Progress</div><div class="metric-value accent">${inProg}</div></div>
-    </div>
-    <div class="metric-pill clickable" onclick="setStatusFilter('blocked')">
-      <div class="metric-stack"><div class="metric-label">Blocked</div><div class="metric-value orange">${blocked}</div></div>
-    </div>
-    <div class="metric-pill clickable" onclick="setStatusFilter('overdue')">
-      <div class="metric-stack"><div class="metric-label">Overdue</div><div class="metric-value red">${overdue}</div></div>
-    </div>
-    <div class="metric-pill">
-      <div class="metric-stack"><div class="metric-label">Projects</div><div class="metric-value">${S.projects.length}</div></div>
-    </div>
-    <div class="metric-pill clickable" onclick="switchView('payments')">
-      <div class="metric-stack"><div class="metric-label">Pending Pay</div><div class="metric-value yellow">₹${pendPay.toLocaleString()}</div></div>
-    </div>
-    ${nd?`<div class="metric-pill">
-      <div class="metric-stack"><div class="metric-label">Next Due</div><div class="metric-value" style="font-size:14px">${dispDate(nd.due)}</div><div class="metric-sub">${esc(nd.title).slice(0,22)}…</div></div>
-    </div>`:''}
-  `;
+  // Update Bloomberg ticker ribbon
+  const openCount = S.tasks.filter(t=>t.status!=='done').length;
+  const tickerParts = [
+    displayRev ? `REV ₹${displayRev.toLocaleString()} ${S.revenueAuto?'▲':''}` : null,
+    `OPEN ${openCount}`,
+    pending  ? `PENDING ${pending}`     : null,
+    inProg   ? `WIP ${inProg}`          : null,
+    blocked  ? `BLOCKED ${blocked} ⚠`  : null,
+    overdue  ? `OVERDUE ${overdue} ✕`  : null,
+    S.projects.length ? `PROJECTS ${S.projects.length}` : null,
+    pendPay  ? `PAY DUE ₹${pendPay.toLocaleString()}` : null,
+    nd       ? `NEXT DUE ${dispDate(nd.due)} · ${nd.title.slice(0,22)}` : null,
+    S.roles.length ? S.roles.slice(0,4).map(r=>`${r} ${S.tasks.filter(t=>t.role===r&&t.status!=='done').length}`).join('   ·   ') : null,
+  ].filter(Boolean);
+  const tickerText = tickerParts.join('   ·   ');
+  const ticker = document.getElementById('kn-ticker-content');
+  if (ticker && tickerText) {
+    ticker.textContent = tickerText + '   ·   ' + tickerText;
+  }
 }
 
 function toggleRevenueMode() {
@@ -2428,6 +2717,10 @@ function switchView(v) {
   document.querySelectorAll('.view-tab').forEach((el,i) => el.classList.toggle('active', tabs[i]===v));
   document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
+  // Sync header nav active state (first 4 nav links map to views; 5th = Roles)
+  document.querySelectorAll('#kn-nav .kn-nav-link').forEach((el,i) => {
+    el.classList.toggle('is-active', tabs[i] === v);
+  });
   // Close mobile sidebar on navigation
   const sb = document.getElementById('sidebar');
   if (sb.classList.contains('open')) {
