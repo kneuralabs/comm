@@ -875,7 +875,7 @@
   @media (max-width: 1023px) and (min-width: 768px) {
     html { font-size: 16px; }
     .header-top { height: 48px; padding: 0 16px; gap: 8px; }
-    :root { --header-h: 107px; }
+    :root { --header-h: 110px; }
     .logo-full { display: none; }
     .logo-short { display: inline; }
     #save-btn-label { display: none; }
@@ -889,7 +889,7 @@
 
   /* ── TABLET PORTRAIT landscape override ── */
   @media (max-width: 1023px) and (min-width: 768px) and (orientation: landscape) {
-    :root { --header-h: 91px; }
+    :root { --header-h: 110px; }
     .header-top { height: 41px; padding: 0 14px; gap: 7px; }
     .header-metrics { height: 50px; }
     .metric-value { font-size: 18px; }
@@ -900,12 +900,13 @@
   /* ── LARGE PHONE LANDSCAPE / SMALL TABLET 600–767px ── */
   @media (max-width: 767px) and (min-width: 600px) {
     html { font-size: 15.5px; }
-    :root { --header-h: 98px; }
+    :root { --header-h: 110px; }
     .header-top { height: 46px; padding: 0 14px; gap: 8px; }
     .logo-full { display: none; }
     .logo-short { display: inline; }
     #save-btn-label { display: none; }
     .header-date { display: none; }
+    #sb-toggle { display: flex; }
     #sidebar { width: 185px; }
     .metric-pill { padding: 0 11px; }
     .metric-value { font-size: 18px; }
@@ -917,7 +918,7 @@
   /* ── PHONE PORTRAIT 400–599px ── */
   @media (max-width: 599px) {
     html { font-size: 15px; }
-    :root { --header-h: 98px; }
+    :root { --header-h: 84px; }
 
     /* Bottom nav visible, sidebar overlays */
     #mobile-nav { display: flex; flex-direction: column; }
@@ -1012,12 +1013,11 @@
   /* ── SMALL PHONE <400px ── */
   @media (max-width: 399px) {
     html { font-size: 14px; }
-    :root { --header-h: 94px; }
+    :root { --header-h: 84px; }
     .metric-pill { padding: 0 8px; }
     .metric-value { font-size: 16px; }
     .metric-label { font-size: 9px; }
     .header-top { padding: 0 8px; gap: 4px; }
-    :root { --header-h: 94px; }
     .logo-full { display: none; }
     .logo-short { display: inline; }
     .logo { font-size: 13px; }
@@ -1301,6 +1301,9 @@
     .kn-eyebrow { display: none; }
     :root { --header-h: 84px; }
     .kn-ftr-grid { grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 14px 10px; }
+  }
+  @media (max-width: 480px) {
+    .kn-ftr-grid { grid-template-columns: 1fr; gap: 14px; }
   }
   @media (max-width: 812px) and (orientation: landscape) and (max-height: 500px) {
     /* Landscape phone: eyebrow + ticker hidden → just bar = 52px */
