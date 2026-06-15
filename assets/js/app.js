@@ -178,8 +178,8 @@ const App = () => {
   if (!ready) {
     return (
       <div style={{ height:"100dvh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:18, background:"var(--bg)" }}>
-        <img src="LOGO.png" alt="Kneura" style={{ height:52, width:52, borderRadius:14, objectFit:"cover", boxShadow:"var(--sh-2)", animation:"breathe 1.8s ease-in-out infinite" }} />
-        <div style={{ width:22, height:22, borderRadius:"50%", border:"2.5px solid var(--border2)", borderTopColor:"var(--accent)", animation:"spin 0.7s linear infinite" }} />
+        <img src="LOGO.png" alt="Kneura" style={{ height:52, width:52, borderRadius:14, objectFit:"cover", boxShadow:"var(--sh-2)" }} />
+        <div className="kn-spin" style={{ width:22, height:22, borderRadius:"50%", border:"2.5px solid var(--border2)", borderTopColor:"var(--accent)" }} />
       </div>
     );
   }
