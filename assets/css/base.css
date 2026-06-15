@@ -1,0 +1,75 @@
+/* ════════════════════════════════════════════════════════════════
+   BASE — reset, document, controls, accessibility
+   ════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+button, input, select, textarea { font-family: var(--font-sans); -webkit-tap-highlight-color: transparent; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--text4); background-clip: content-box; }
+* { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+
+/* ── Selection ── */
+::selection { background: hsl(var(--mood-h) var(--mood-s) 55% / 0.24); }
+
+/* ── Focus: visible, accessible (replaces the old outline:none) ── */
+:focus { outline: none; }
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-hover) !important;
+  box-shadow: 0 0 0 3.5px hsl(var(--mood-h) var(--mood-s) 52% / 0.18);
+}
+select option { background: var(--surface2); color: var(--text); }
+
+/* ── Theme transition ── */
+body, .theme-transition * {
+  transition: background-color 0.32s var(--ease-smooth), border-color 0.32s var(--ease-smooth), color 0.32s var(--ease-smooth);
+}
+
+/* ── Frosted chrome ── */
+.kn-header, .kn-nav, .kn-footer {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+}
+
+/* ── Button helpers ── */
+.btn-ghost:hover { background: var(--surface2) !important; color: var(--text) !important; }
+.nav-tab:hover   { color: var(--text2) !important; }
+
+/* ── Hide-on-desktop helper (per-row meta for compact layouts) ── */
+.kn-row-meta { display: none; }
+
+/* ── Strips that scroll on touch ── */
+.kn-metrics, .kn-nav { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.kn-metrics::-webkit-scrollbar, .kn-nav::-webkit-scrollbar { display: none; }
+
+/* ── Native-style mobile chrome (off on desktop) ── */
+.kn-bottom-nav { display: none; }
+.kn-fab        { display: none; }
+
+/* ── Tabular numerals everywhere numbers live ── */
+.kn-num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }

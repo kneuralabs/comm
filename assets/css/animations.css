@@ -1,0 +1,112 @@
+/* ════════════════════════════════════════════════════════════════
+   ANIMATIONS — the "Living Command Surface"
+   Ambient aurora reacts to operational health · grain · motion system
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Keyframes ── */
+@keyframes fadeSlide    { from { opacity:0; transform:translateY(6px) }  to { opacity:1; transform:translateY(0) } }
+@keyframes scaleIn      { from { opacity:0; transform:scale(0.96) }      to { opacity:1; transform:scale(1) } }
+@keyframes slideInRight { from { transform:translateX(100%) }            to { transform:translateX(0) } }
+@keyframes slideDown    { from { opacity:0; transform:translateY(-5px) } to { opacity:1; transform:translateY(0) } }
+@keyframes pulseOpacity { 0%,100% { opacity:1 } 50% { opacity:0.3 } }
+@keyframes spin         { to { transform:rotate(360deg) } }
+@keyframes breathe      { 0%,100% { opacity:0.55; transform:scale(0.97) } 50% { opacity:1; transform:scale(1) } }
+@keyframes rollIn       { from { opacity:0; transform:translateY(0.55em) } to { opacity:1; transform:translateY(0) } }
+@keyframes drawCheck    { from { stroke-dashoffset:22 } to { stroke-dashoffset:0 } }
+@keyframes popIn        { 0% { transform:scale(0.2); opacity:0 } 60% { transform:scale(1.15) } 100% { transform:scale(1); opacity:1 } }
+@keyframes sheetUp      { from { opacity:0; transform:translateY(14px) scale(0.98) } to { opacity:1; transform:translateY(0) scale(1) } }
+@keyframes shimmer      { 0% { background-position:-160% 0 } 100% { background-position:260% 0 } }
+@keyframes auroraDrift  {
+  0%   { transform:translate3d(-6%,-4%,0) rotate(0deg)   scale(1.15); }
+  50%  { transform:translate3d(6%,4%,0)   rotate(8deg)   scale(1.3); }
+  100% { transform:translate3d(-6%,-4%,0) rotate(0deg)   scale(1.15); }
+}
+@keyframes auroraDrift2 {
+  0%   { transform:translate3d(5%,6%,0)   rotate(0deg)   scale(1.2); }
+  50%  { transform:translate3d(-7%,-5%,0) rotate(-10deg) scale(1.05); }
+  100% { transform:translate3d(5%,6%,0)   rotate(0deg)   scale(1.2); }
+}
+
+/* ── The living aurora (fixed, behind everything; hue = operational mood) ── */
+.kn-aurora {
+  position: fixed; inset: -25%; z-index: 0; pointer-events: none;
+  filter: blur(60px) saturate(140%);
+  transition: opacity 0.8s var(--ease-smooth);
+  contain: strict;
+}
+.kn-aurora::before, .kn-aurora::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  mix-blend-mode: screen;
+  transition: background 1.2s var(--ease-smooth);
+}
+.kn-aurora::before {
+  background:
+    radial-gradient(38% 38% at 28% 32%, hsl(var(--mood-h) var(--mood-s) 56% / calc(var(--mood-e) + 0.10)) 0%, transparent 70%),
+    radial-gradient(34% 34% at 74% 24%, hsl(calc(var(--mood-h) + 26) 85% 58% / calc(var(--mood-e) + 0.04)) 0%, transparent 70%);
+  animation: auroraDrift 26s var(--ease-smooth) infinite;
+}
+.kn-aurora::after {
+  background:
+    radial-gradient(40% 40% at 68% 78%, hsl(calc(var(--mood-h) - 22) 80% 54% / calc(var(--mood-e) + 0.06)) 0%, transparent 72%),
+    radial-gradient(30% 30% at 18% 82%, hsl(var(--mood-h) 70% 52% / calc(var(--mood-e))) 0%, transparent 72%);
+  animation: auroraDrift2 32s var(--ease-smooth) infinite;
+}
+[data-theme="dark"] .kn-aurora { filter: blur(70px) saturate(160%); }
+
+/* ── Fine grain texture (pro-grade tactility) ── */
+.kn-grain {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] .kn-grain { opacity: 0.05; mix-blend-mode: overlay; }
+
+/* ── Lift + magnetic tilt ── */
+.kn-lift { transition: transform 0.24s var(--ease-smooth), box-shadow 0.24s var(--ease-smooth), border-color 0.18s; will-change: transform; }
+.kn-lift:hover { transform: translateY(-3px); box-shadow: var(--sh-2); }
+.kn-tilt { transform-style: preserve-3d; transition: transform 0.18s var(--ease-out), box-shadow 0.24s var(--ease-smooth); will-change: transform; }
+.kn-tilt .kn-tilt-glare {
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+  background: radial-gradient(180px 180px at var(--gx,50%) var(--gy,50%), rgba(255,255,255,0.18), transparent 60%);
+  transition: opacity 0.24s var(--ease-smooth); mix-blend-mode: soft-light;
+}
+.kn-tilt:hover .kn-tilt-glare { opacity: 1; }
+.kn-tilt:hover { box-shadow: var(--sh-2) !important; }
+@media (hover:none) {
+  .kn-lift:hover, .kn-tilt:hover { transform: none; box-shadow: none; }
+  .kn-tilt:hover { box-shadow: var(--sh-1); }
+}
+
+/* ── Press feedback ── */
+.kn-press { transition: transform 0.12s var(--ease-spring); }
+.kn-press:active { transform: scale(0.94); }
+
+/* ── Custom checkbox (draws the check on completion) ── */
+.kn-check { transition: background 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth); }
+.kn-check svg { display: block; }
+.kn-check .kn-check-path {
+  stroke-dasharray: 22; stroke-dashoffset: 22;
+}
+.kn-check.is-done .kn-check-path { animation: drawCheck 0.34s var(--ease-out) 0.02s forwards; }
+
+/* ── Odometer roll for metrics ── */
+.kn-roll { display: inline-block; }
+.kn-roll-key { display: inline-block; animation: rollIn 0.5s var(--ease-out) both; }
+
+/* ── Skeleton shimmer (loading) ── */
+.kn-shimmer {
+  background: linear-gradient(100deg, var(--surface2) 30%, var(--surface3) 50%, var(--surface2) 70%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
+}
+
+/* ── Animated focus glow used on hero/primary surfaces ── */
+.kn-moodglow { box-shadow: var(--glow); }
+
+/* ── Respect reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .kn-aurora { display: none; }
+}
