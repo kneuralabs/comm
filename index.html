@@ -36,8 +36,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- SheetJS for Excel processing -->
-<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<!-- Supabase client (cloud sync backend) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <!-- React + Babel (design runtime) -->
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
@@ -163,8 +163,8 @@
 <div id="root"></div>
 
 <!-- ════════════════════════════════════════════════════════════════
-     DATA + PERSISTENCE LAYER  (preserved from the live app)
-     GitHub data.xlsx sync · localStorage · IndexedDB · debounced save
+     DATA + PERSISTENCE LAYER
+     Supabase cloud sync · localStorage · IndexedDB · debounced save
      ════════════════════════════════════════════════════════════════ -->
 <script>
 // ==================== UTILS ====================
@@ -181,222 +181,49 @@ function toast(msg) { if (window.__toast) window.__toast(msg); }
 function _flashSaveBtn() { if (window.__flashSave) window.__flashSave(); }
 function _showError() { toast('Save failed'); }
 
-// ==================== GITHUB SYNC ====================
-const GITHUB_OWNER = 'kneuralabs';
-const GITHUB_REPO = 'comm';
-const GITHUB_DEFAULT_TOKEN = String.fromCharCode(103,104,112,95,76,74,80,75,113,57,81,72,51,108,115,104,98,101,77,82,68,97,87,74,114,89,50,109,72,83,74,51,108,116,52,50,75,53,74,49);
+// ==================== SUPABASE SYNC ====================
+const SB_URL = 'https://brysartqcjylgqwmnjkk.supabase.co';
+const SB_KEY = 'sb_publishable_C5e5ViwIlW9dV14ZLi4O0A_ipIXhTB5';
+const SB_TABLE = 'comm_state';
+const SB_ROW = 'main';
 
-let _lastKnownSHA = null;
-let _ghAuthFailed = false, _ghAuthNotified = false; // pause sync after an unrecoverable 401/403
-let GITHUB_CONFIG = { token: null, owner: GITHUB_OWNER, repo: GITHUB_REPO, branch: 'main', connected: true };
+let _sb = null;                 // Supabase client
+let _cloudUpdatedAt = null;     // last-seen remote updated_at (for change detection)
+let _cloudStatus = 'connecting';// connecting | live | offline
 
-function loadGitHubConfig() {
+function initSupabase() {
   try {
-    GITHUB_CONFIG.token  = localStorage.getItem('github_token') || GITHUB_DEFAULT_TOKEN;
-    GITHUB_CONFIG.owner  = localStorage.getItem('github_owner')  || GITHUB_OWNER;
-    GITHUB_CONFIG.repo   = localStorage.getItem('github_repo')   || GITHUB_REPO;
-    GITHUB_CONFIG.branch = localStorage.getItem('github_branch') || 'main';
-  } catch (e) {
-    GITHUB_CONFIG.token = GITHUB_DEFAULT_TOKEN;
-  }
+    if (window.supabase && window.supabase.createClient) {
+      _sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false } });
+    } else {
+      _cloudStatus = 'offline';
+      console.error('[ERROR] Supabase library not loaded');
+    }
+  } catch (e) { _cloudStatus = 'offline'; console.error('[ERROR] Supabase init failed:', e); }
 }
 
-async function ensureWriteToken() {
-  if (GITHUB_CONFIG.token) return;
-  const t = (window.prompt('Enter a GitHub token with write access:') || '').trim();
-  if (t) { GITHUB_CONFIG.token = t; try { localStorage.setItem('github_token', t); } catch(e) {} }
-}
-
-// Persist edited GitHub settings (token / owner / repo / branch). Only provided keys change.
-window.setGitHubConfig = function(cfg) {
-  cfg = cfg || {};
-  const put = (k, storeKey) => {
-    if (cfg[k] === undefined) return;
-    const v = (cfg[k] || '').trim();
-    GITHUB_CONFIG[k] = v || (k === 'branch' ? 'main' : (k === 'owner' ? GITHUB_OWNER : k === 'repo' ? GITHUB_REPO : null));
-    try { v ? localStorage.setItem(storeKey, v) : localStorage.removeItem(storeKey); } catch(e) {}
-  };
-  put('token', 'github_token');
-  put('owner', 'github_owner');
-  put('repo', 'github_repo');
-  put('branch', 'github_branch');
-  _lastKnownSHA = null; // force a fresh SHA fetch against the new target
-  _ghAuthFailed = false; _ghAuthNotified = false; // re-enable sync with the new settings
-};
-
-window.resetGitHubToken = function() {
-  try { localStorage.removeItem('github_token'); } catch(e) {}
-  GITHUB_CONFIG.token = null;
-  console.log('[DEBUG] Token cleared. Next save will prompt for token.');
-};
-
-// Read data.xlsx from GitHub
-async function readDataFromGitHub() {
+// Read the shared workspace row → { data, updatedAt } | null
+async function readDataFromCloud() {
+  if (!_sb) return null;
   try {
-    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`;
-    const headers = { 'Accept': 'application/vnd.github.v3+json' };
-    if (GITHUB_CONFIG.token) headers['Authorization'] = `Bearer ${GITHUB_CONFIG.token}`;
-    const response = await fetch(url, { headers });
-    if (!response.ok) {
-      if (response.status === 404) return null;
-      throw new Error(`GitHub API error: ${response.status}`);
-    }
-    const fileData = await response.json();
-    _lastKnownSHA = fileData.sha;
-    const content = atob(fileData.content);
-    const bytes = new Uint8Array(content.length);
-    for (let i = 0; i < content.length; i++) bytes[i] = content.charCodeAt(i);
-    const workbook = XLSX.read(bytes, { type: 'array' });
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-    if (jsonData.length === 0) return null;
-    return parseExcelData(jsonData);
-  } catch (error) {
-    console.error('[ERROR] Error reading from GitHub:', error);
-    throw error;
-  }
+    const { data, error } = await _sb.from(SB_TABLE).select('data, updated_at').eq('id', SB_ROW).maybeSingle();
+    if (error) { console.error('[ERROR] Supabase read:', error.message); _cloudStatus = 'offline'; return null; }
+    _cloudStatus = 'live';
+    if (!data) return null;
+    return { data: data.data || {}, updatedAt: data.updated_at };
+  } catch (e) { _cloudStatus = 'offline'; console.error('[ERROR] Supabase read:', e); return null; }
 }
 
-// Write data.xlsx to GitHub
-async function writeDataToGitHub() {
-  if (_ghAuthFailed) return; // sync paused until a working token is saved (data is kept locally)
-  await ensureWriteToken();
-  if (!GITHUB_CONFIG.token) { toast('Save skipped: no GitHub token'); return; }
+// Upsert the current state to the shared workspace row
+async function writeDataToCloud() {
+  if (!_sb) return;
   try {
-    const excelData = convertDataToExcel();
-    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
-    const wbout = XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
-
-    const fetchSHA = async () => {
-      try {
-        const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
-          headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json' }
-        });
-        if (r.ok) { const d = await r.json(); return d.sha; }
-      } catch (e) {}
-      return null;
-    };
-    const putFile = async (sha) => {
-      const body = { message: 'Update data from KneuraCOMM', content: wbout, branch: GITHUB_CONFIG.branch };
-      if (sha) body.sha = sha;
-      return fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-    };
-
-    let sha = await fetchSHA();
-    let response = await putFile(sha);
-    let retries = 0;
-    while ((response.status === 409 || response.status === 422) && retries < 3) {
-      retries++;
-      await new Promise(r => setTimeout(r, retries * 300));
-      sha = await fetchSHA();
-      response = await putFile(sha);
-    }
-    // Auth failure (bad / expired / insufficient-scope token) or rate limiting
-    if (response.status === 401 || response.status === 403) {
-      const bodyText = await response.clone().text().catch(() => '');
-      const rateLimited = response.status === 403 && (/(rate limit|secondary|abuse)/i.test(bodyText) || response.headers.get('retry-after'));
-      if (rateLimited) {
-        const waitMs = Math.min((Number(response.headers.get('retry-after')) || 2) * 1000, 8000);
-        await new Promise(r => setTimeout(r, waitMs));
-        sha = await fetchSHA();
-        response = await putFile(sha);
-      } else if (GITHUB_CONFIG.token !== GITHUB_DEFAULT_TOKEN) {
-        // A custom token was rejected — fall back to the built-in default once
-        try { localStorage.removeItem('github_token'); } catch(e) {}
-        GITHUB_CONFIG.token = GITHUB_DEFAULT_TOKEN;
-        sha = await fetchSHA();
-        response = await putFile(sha);
-      }
-    }
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '');
-      console.error('[ERROR] GitHub upload failed:', response.status, errorText);
-      if (response.status === 401 || response.status === 403) {
-        // Stop hammering the API on every edit — local data is already saved.
-        _ghAuthFailed = true;
-        if (!_ghAuthNotified) { _ghAuthNotified = true; toast('GitHub sync paused — add a token with write access in Settings → GitHub'); }
-        return;
-      }
-      throw new Error(`GitHub upload failed: ${response.status}`);
-    }
-    const result = await response.json();
-    _lastKnownSHA = result.content?.sha || _lastKnownSHA;
-  } catch (error) {
-    console.error('[ERROR] Error writing to GitHub:', error);
-    toast('GitHub sync failed: ' + error.message);
-  }
-}
-
-// Convert application data to Excel format
-function convertDataToExcel() {
-  const data = [];
-  data.push(['KneuraCOMM Data Export']);
-  data.push([]);
-  data.push(['TASKS']);
-  data.push(['ID', 'Title', 'Role', 'Project', 'Priority', 'Status', 'Due', 'Next Action', 'Estimate', 'Created', 'Notes']);
-  S.tasks.forEach(task => {
-    data.push([task.id || '', task.title || '', task.role || '', task.project || '', task.priority || '', task.status || '', task.due || '', task.nextAction || '', task.est || '', task.created || '', task.notes || '']);
-  });
-  data.push([]);
-  data.push(['PROJECTS']);
-  data.push(['ID', 'Name', 'Role', 'Desc', 'Archived', 'ArchivedAt']);
-  S.projects.forEach(project => { data.push([project.id||'', project.name||'', project.role||'', project.desc||'', 'false', '']); });
-  (S.archivedProjects || []).forEach(project => { data.push([project.id||'', project.name||'', project.role||'', project.desc||'', 'true', project.archivedAt||'']); });
-  data.push([]);
-  data.push(['PAYMENTS']);
-  data.push(['ID', 'Client', 'Amount', 'Due', 'Status', 'Notes']);
-  S.payments.forEach(payment => { data.push([payment.id||uid(), payment.client||'', payment.amount||'', payment.due||'', payment.status||'', payment.notes||'']); });
-  data.push([]);
-  data.push(['DECISIONS']);
-  data.push(['ID', 'Timestamp', 'Note']);
-  S.decisions.forEach(decision => { data.push([decision.id||uid(), decision.ts||'', decision.note||decision.text||'']); });
-  data.push([]);
-  data.push(['METADATA']);
-  data.push(['Revenue', S.revenue || 0]);
-  data.push(['Revenue Auto', S.revenueAuto ? 'true' : 'false']);
-  data.push(['Roles', JSON.stringify(S.roles || [])]);
-  data.push(['Role Colors', JSON.stringify(S.roleColors || {})]);
-  return data;
-}
-
-// Parse Excel data back to application format
-function parseExcelData(excelData) {
-  const result = { tasks: [], projects: [], archivedProjects: [], payments: [], decisions: [], revenue: 0, revenueAuto: false, roles: ['CEO','COO','CFO','CMO','CIO'], roleColors: {} };
-  let section = null, headers = null;
-  for (let i = 0; i < excelData.length; i++) {
-    const row = excelData[i];
-    if (!row || row.length === 0 || !row[0]) continue;
-    const first = String(row[0]).trim();
-    if (first === 'TASKS')        { section = 'tasks';     headers = excelData[i+1]; i++; continue; }
-    else if (first === 'PROJECTS'){ section = 'projects';  headers = excelData[i+1]; i++; continue; }
-    else if (first === 'PAYMENTS'){ section = 'payments';  headers = excelData[i+1]; i++; continue; }
-    else if (first === 'DECISIONS'){ section = 'decisions';headers = excelData[i+1]; i++; continue; }
-    else if (first === 'METADATA'){ section = 'metadata'; continue; }
-
-    if (section === 'tasks' && headers) {
-      result.tasks.push({ id: row[0]||uid(), title: row[1]||'', role: row[2]||'', project: row[3]||'', priority: row[4]||'medium', status: row[5]||'pending', due: row[6]||'', nextAction: row[7]||'', est: row[8]||'', created: row[9]||'', notes: row[10]||'' });
-    } else if (section === 'projects' && headers) {
-      const project = { id: row[0]||uid(), name: row[1]||'', role: row[2]||'', desc: row[3]||'' };
-      if (String(row[4]).toLowerCase() === 'true') { project.archivedAt = row[5]||''; result.archivedProjects.push(project); }
-      else { result.projects.push(project); }
-    } else if (section === 'payments' && headers) {
-      result.payments.push({ id: row[0]||uid(), client: row[1]||'', amount: row[2]||'', due: row[3]||'', status: row[4]||'pending', notes: row[5]||'' });
-    } else if (section === 'decisions' && headers) {
-      result.decisions.push({ id: row[0]||uid(), ts: row[1]||'', note: row[2]||'' });
-    } else if (section === 'metadata') {
-      if (first === 'Revenue') result.revenue = Number(row[1]) || 0;
-      else if (first === 'Revenue Auto') result.revenueAuto = row[1] === 'true';
-      else if (first === 'Roles') { try { result.roles = JSON.parse(row[1]); } catch(e) {} }
-      else if (first === 'Role Colors') { try { result.roleColors = JSON.parse(row[1]); } catch(e) {} }
-    }
-  }
-  return result;
+    const now = new Date().toISOString();
+    const { error } = await _sb.from(SB_TABLE).upsert({ id: SB_ROW, data: S, updated_at: now }, { onConflict: 'id' });
+    if (error) { _cloudStatus = 'offline'; console.error('[ERROR] Supabase write:', error.message); toast('Sync failed: ' + error.message); return; }
+    _cloudStatus = 'live';
+    _cloudUpdatedAt = now;
+  } catch (e) { _cloudStatus = 'offline'; console.error('[ERROR] Supabase write:', e); }
 }
 
 // ==================== STATE ====================
@@ -430,12 +257,12 @@ function _writeToDisk() {
   try { localStorage.setItem(STORE, payload); localStorage.setItem(STORE_META, JSON.stringify({ savedAt: now.toISOString() })); }
   catch(e) { _showError(); return; }
   _idbWrite({ data: payload, savedAt: now.toISOString() });
-  writeDataToGitHub().catch(err => console.error('GitHub sync error:', err));
+  writeDataToCloud().catch(err => console.error('Cloud sync error:', err));
   _lastSavedAt = now;
   _flashSaveBtn();
 }
 
-// Auto-save: persist locally immediately, debounce GitHub push
+// Auto-save: persist locally immediately, debounce the cloud push
 function save() {
   const payload = JSON.stringify(S), now = new Date();
   try { localStorage.setItem(STORE, payload); localStorage.setItem(STORE_META, JSON.stringify({ savedAt: now.toISOString() })); } catch(e) {}
@@ -445,32 +272,32 @@ function save() {
     _saveDebounceTimer = null;
     _lastSavedAt = new Date();
     _flashSaveBtn();
-    writeDataToGitHub().catch(err => console.error('GitHub sync error:', err));
+    writeDataToCloud().catch(err => console.error('Cloud sync error:', err));
   }, 1500);
 }
 
 function manualSave() { clearTimeout(_saveDebounceTimer); _saveDebounceTimer = null; _writeToDisk(); }
 
-// Background sync: pull changes from other devices
-async function _syncFromGitHub() {
+// Background sync: pull changes made on other devices
+async function _syncFromCloud() {
   if (document.visibilityState !== 'visible') return;
   if (_saveDebounceTimer) return;
+  if (!_sb) return;
   try {
-    const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`,
-      { headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json' } });
-    if (!r.ok) return;
-    const meta = await r.json();
-    if (!meta.sha || meta.sha === _lastKnownSHA) return;
-    const data = await readDataFromGitHub();
-    if (data && Object.keys(data).length > 0) {
-      S = { ...S, ...data };
+    const { data, error } = await _sb.from(SB_TABLE).select('updated_at').eq('id', SB_ROW).maybeSingle();
+    if (error || !data) return;
+    if (!data.updated_at || data.updated_at === _cloudUpdatedAt) return;
+    const remote = await readDataFromCloud();
+    if (remote && remote.data && Object.keys(remote.data).length > 0) {
+      _cloudUpdatedAt = remote.updatedAt;
+      S = { ...S, ...remote.data };
       if (window.__refresh) window.__refresh();
       toast('↓ Synced');
     }
   } catch(e) {}
 }
 
-// Load: localStorage first, then IndexedDB fallback, then seed demo data
+// Load: cloud first (source of truth), falling back to localStorage / IndexedDB, then seed demo data
 async function load() {
   _idb = await _openIDB();
   let loaded = false;
@@ -480,6 +307,17 @@ async function load() {
     if (snap && snap.data) { try { S = Object.assign({}, S, JSON.parse(snap.data)); loaded = true; } catch(e) {} }
   }
   try { const m = localStorage.getItem(STORE_META); if (m) { const meta = JSON.parse(m); if (meta.savedAt) _lastSavedAt = new Date(meta.savedAt); } } catch(e) {}
+
+  // Adopt the cloud copy unless our local copy is strictly newer (offline edits win until pushed)
+  const remote = await readDataFromCloud();
+  if (remote) {
+    _cloudUpdatedAt = remote.updatedAt;
+    const localNewer = _lastSavedAt && remote.updatedAt && new Date(_lastSavedAt) > new Date(remote.updatedAt);
+    if (!localNewer && remote.data && Object.keys(remote.data).length > 0) {
+      S = Object.assign({}, S, remote.data);
+      loaded = true;
+    }
+  }
 
   if (!S.projects.length) {
     S.projects = [ { id: uid(), name: 'Product Launch', role: 'CEO', desc: '' }, { id: uid(), name: 'Q3 Financials', role: 'CFO', desc: '' } ];
@@ -497,7 +335,7 @@ async function load() {
   }
 }
 
-loadGitHubConfig();
+initSupabase();
 </script>
 
 <!-- ════════════════════════════════════════════════════════════════
@@ -819,21 +657,10 @@ const DecisionsView = ({ decisions, onEdit, onDelete }) => (
 );
 
 /* ── Settings panel ── */
-const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onDisconnect, onToast }) => {
+const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onToast }) => {
   const roles = (S.roles || []).map(name => ({ name, color: roleColor(name), count: S.tasks.filter(t => t.role === name).length }));
-  const [gh, setGh] = useState({ token:"", owner:GITHUB_CONFIG.owner, repo:GITHUB_CONFIG.repo, branch:GITHUB_CONFIG.branch });
-  const setG = (k, v) => setGh(x => ({ ...x, [k]:v }));
-  const usingCustomToken = (() => { try { return !!localStorage.getItem('github_token'); } catch(e) { return false; } })();
-  const ghInp = { width:"100%", background:"var(--surface)", border:"1px solid var(--border)", borderRadius:4, color:"var(--text)", fontFamily:MONO, fontSize:12.5, padding:"8px 10px", outline:"none", boxSizing:"border-box", marginTop:4 };
-  const ghLbl = { fontSize:9.5, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)" };
-  const saveGitHub = () => {
-    const cfg = { owner:gh.owner, repo:gh.repo, branch:gh.branch };
-    if (gh.token.trim()) cfg.token = gh.token.trim();
-    window.setGitHubConfig(cfg);
-    setG("token", "");
-    onToast && onToast("GitHub settings saved");
-    try { manualSave(); } catch(e) {} // validate against the new target right away
-  };
+  const online = _cloudStatus !== 'offline';
+  const ghLbl = { fontSize:9.5, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)", marginBottom:4 };
   return (
     <Fragment>
       <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:199, background:"rgba(0,0,0,0.35)", backdropFilter:"blur(4px)" }} />
@@ -861,36 +688,21 @@ const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onDisconnect, onToast
           </div>
           <div style={{ padding:"16px 18px" }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-              <span style={{ fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)" }}>GitHub</span>
+              <span style={{ fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)" }}>Sync</span>
               <div style={{ display:"flex", alignItems:"center", gap:5 }}>
-                <div style={{ width:7, height:7, borderRadius:"50%", background:"#22c55e", animation:"pulseOpacity 2.5s ease infinite" }}></div>
-                <span style={{ fontSize:11, fontWeight:700, color:"#22c55e" }}>Live</span>
+                <div style={{ width:7, height:7, borderRadius:"50%", background:online?"#22c55e":"#c8281e", animation:online?"pulseOpacity 2.5s ease infinite":"none" }}></div>
+                <span style={{ fontSize:11, fontWeight:700, color:online?"#22c55e":"#c8281e" }}>{online?"Live":"Offline"}</span>
               </div>
             </div>
-            <div style={{ display:"flex", flexDirection:"column", gap:11 }}>
-              <div>
-                <label style={ghLbl}>Access token</label>
-                <input type="password" value={gh.token} onChange={e => setG("token", e.target.value)} placeholder={usingCustomToken ? "•••••••• (saved — type to replace)" : "ghp_… (paste to override default)"} autoComplete="off" style={ghInp} />
-                <div style={{ fontSize:10, color:"var(--text4)", marginTop:4, lineHeight:1.4 }}>Stored only in this browser. Needs <span style={{ fontFamily:MONO }}>contents: read/write</span> on the repo below.</div>
-              </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                <div>
-                  <label style={ghLbl}>Owner</label>
-                  <input value={gh.owner} onChange={e => setG("owner", e.target.value)} placeholder="owner" style={ghInp} />
+            <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+              {[["Backend","Supabase"],["Project","brysartqcjylgqwmnjkk"],["Storage","comm_state · main"]].map(([label,value]) => (
+                <div key={label} style={{ padding:"10px 12px", borderRadius:4, border:"1px solid var(--border)", background:"var(--surface2)" }}>
+                  <div style={ghLbl}>{label}</div>
+                  <div style={{ fontSize:12.5, fontWeight:600, color:"var(--text)", fontFamily:MONO, wordBreak:"break-all" }}>{value}</div>
                 </div>
-                <div>
-                  <label style={ghLbl}>Repo</label>
-                  <input value={gh.repo} onChange={e => setG("repo", e.target.value)} placeholder="repo" style={ghInp} />
-                </div>
-              </div>
-              <div>
-                <label style={ghLbl}>Branch</label>
-                <input value={gh.branch} onChange={e => setG("branch", e.target.value)} placeholder="main" style={ghInp} />
-              </div>
-              <div style={{ display:"flex", gap:6 }}>
-                <button onClick={saveGitHub} style={{ flex:1, height:32, border:"none", borderRadius:4, fontSize:12, fontWeight:700, color:"#fff", background:"var(--accent)", cursor:"pointer", fontFamily:SANS }}>Save</button>
-                <button onClick={onDisconnect} style={{ height:32, padding:"0 12px", border:"1px solid var(--border)", borderRadius:4, fontSize:12, fontWeight:500, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:SANS }}>Disconnect</button>
-              </div>
+              ))}
+              <div style={{ fontSize:10, color:"var(--text4)", lineHeight:1.5, marginTop:2 }}>Changes save automatically to the cloud and sync across devices. No token needed.</div>
+              <button onClick={() => { try { manualSave(); } catch(e) {} onToast && onToast("Synced"); }} style={{ height:32, border:"none", borderRadius:4, fontSize:12, fontWeight:700, color:"#fff", background:"var(--accent)", cursor:"pointer", fontFamily:SANS, marginTop:2 }}>Sync now</button>
             </div>
           </div>
         </div>
@@ -1007,7 +819,7 @@ const App = () => {
     window.__refresh = () => force();
     window.__flashSave = () => {};
     (async () => { await load(); setReady(true); force(); })();
-    const sync = setInterval(() => { _syncFromGitHub(); }, 30000);
+    const sync = setInterval(() => { _syncFromCloud(); }, 30000);
     return () => { clearInterval(sync); window.__toast = null; window.__refresh = null; window.__flashSave = null; };
   }, []);
 
@@ -1101,7 +913,6 @@ const App = () => {
     S.tasks = S.tasks.map(t => t.role === oldName ? { ...t, role:name } : t);
     commit(); showToast("Role renamed");
   };
-  const onDisconnect = () => { window.resetGitHubToken(); showToast("GitHub token cleared"); };
 
   // Derived
   const tasks = S.tasks || [];
@@ -1209,7 +1020,7 @@ const App = () => {
         <span style={{ fontSize:11, color:"var(--text4)", fontFamily:MONO }}>{_lastSavedAt ? "Saved · " + new Date(_lastSavedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) : "Auto-sync on"}</span>
       </div>
 
-      {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} onAddRole={onAddRole} onRenameRole={onRenameRole} onDisconnect={onDisconnect} onToast={showToast} />}
+      {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} onAddRole={onAddRole} onRenameRole={onRenameRole} onToast={showToast} />}
       {modal && <EntityModal kind={modal.kind} item={modal.item} projects={S.projects||[]} onClose={() => setModal(null)} onSave={f => { saveEntity(modal.kind, f); setModal(null); }} onDelete={id => { deleteEntity(modal.kind, id); setModal(null); }} />}
 
       {toastMsg && (
