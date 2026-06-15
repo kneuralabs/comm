@@ -88,7 +88,21 @@ const TaskRow = ({ task, onStatusChange, onDelete, onEdit }) => {
         borderBottom: open ? "none" : "1px solid var(--line)", cursor:"pointer", transition:"background 0.2s",
       }}>
         <CheckBox done={isDone} onClick={(e) => { e.stopPropagation(); onStatusChange(task.id, isDone ? "pending" : "done"); }} />
-        <div style={{ flex:1, fontSize:"var(--fs-sm)", fontWeight:isDone ? 400 : 500, color:isDone ? "var(--text4)" : "var(--text)", textDecoration:isDone ? "line-through" : "none", letterSpacing:"-0.01em", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", paddingRight:14 }}>{task.title}</div>
+        <div className="kn-task-main" style={{ flex:1, minWidth:0, paddingRight:14 }}>
+          <div style={{ fontSize:"var(--fs-sm)", fontWeight:isDone ? 400 : 500, color:isDone ? "var(--text4)" : "var(--text)", textDecoration:isDone ? "line-through" : "none", letterSpacing:"-0.01em", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{task.title}</div>
+          {/* Mobile-only: surface the same Role · Project · Due data shown in the desktop columns */}
+          <div className="kn-task-submeta" style={{ display:"none", alignItems:"center", gap:8, marginTop:5, whiteSpace:"nowrap", overflow:"hidden" }}>
+            <RoleDot role={task.role} />
+            <span style={{ width:3, height:3, borderRadius:"50%", background:"var(--text4)", flexShrink:0 }} />
+            <span style={{ fontSize:"var(--fs-xs)", color:"var(--text4)", overflow:"hidden", textOverflow:"ellipsis", minWidth:0, flex:"0 1 auto" }}>{projectName(task.project)}</span>
+            {task.due ? (
+              <Fragment>
+                <span style={{ width:3, height:3, borderRadius:"50%", background:"var(--text4)", flexShrink:0 }} />
+                <span className="kn-num" style={{ fontSize:"var(--fs-2xs)", color:dueCol, fontWeight:500, flexShrink:0 }}>{dispDate(task.due)}</span>
+              </Fragment>
+            ) : null}
+          </div>
+        </div>
         <div className="kn-col-status" style={{ width:124 }}><StatusBadge status={task.status} onClick={cycleStatus} /></div>
         <div className="kn-col-role" style={{ width:70 }}><RoleDot role={task.role} /></div>
         <div className="kn-col-project" style={{ width:126, fontSize:"var(--fs-xs)", color:"var(--text4)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{projectName(task.project)}</div>
