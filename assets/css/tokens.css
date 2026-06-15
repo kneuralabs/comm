@@ -18,7 +18,7 @@
   --text:         #14161c;
   --text2:        #3a3d47;   /* ~9:1  */
   --text3:        #585c68;   /* ~6:1  body-secondary, safe for info */
-  --text4:        #8a8f9c;   /* decorative only */
+  --text4:        #666d7a;   /* AA-passing secondary on surface + bg */
 
   /* ── Brand & semantics (vivid, Apple-system-blue family) ── */
   --accent:       #0a6cff;
@@ -34,15 +34,15 @@
   --st-pending:     #6b7686;  --st-pending-bg:  rgba(107,118,134,0.10); --st-pending-bd:  rgba(107,118,134,0.26);
   --st-done:        #12a150;  --st-done-bg:     rgba(18,161,80,0.10);   --st-done-bd:     rgba(18,161,80,0.28);
 
-  /* ── Materials ── */
-  --glass-bg:     rgba(255,255,255,0.66);
-  --glass:        saturate(180%) blur(22px);
+  /* ── Materials (opaque — no backdrop blur, for performance + contrast) ── */
+  --glass-bg:     #ffffff;
+  --glass:        none;
 
   /* ── Living-Surface ambiance (mood is set by JS from operational health) ── */
   --mood-h:       212;   /* hue   — calm blue ⇄ warm red as health degrades */
   --mood-s:       82%;   /* sat   */
   --mood-e:       0.10;  /* energy — drives aurora opacity / motion */
-  --focus:        hsl(var(--mood-h) 90% 52%);
+  --focus:        #0a6cff;
 
   /* ── Type scale (named, finite — no more half-pixel sprawl) ── */
   --fs-overline: 10px;   /* uppercase labels */
@@ -88,10 +88,10 @@
 
   --text:         #f2f5fa;
   --text2:        #c3cfe0;
-  --text3:        #93a6c2;   /* raised from old #6a83a0 for AA */
-  --text4:        #647a99;
+  --text3:        #9fb1cc;   /* AA on dark surface */
+  --text4:        #8094b2;   /* AA-passing secondary on dark */
 
-  --accent:       #3a8dff;
+  --accent:       #1f74d6;   /* AA with white button text */
   --accent-hover: #67a8ff;
   --accent-ink:   #ffffff;
   --red:          #ff5d54;
@@ -103,8 +103,9 @@
   --st-pending:     #8298b4;  --st-pending-bg:  rgba(130,152,180,0.13); --st-pending-bd:  rgba(130,152,180,0.30);
   --st-done:        #2ecd6f;  --st-done-bg:     rgba(46,205,111,0.14);  --st-done-bd:     rgba(46,205,111,0.32);
 
-  --glass-bg:     rgba(10,21,36,0.58);
-  --glass:        saturate(180%) blur(24px);
+  --glass-bg:     #0d1726;
+  --glass:        none;
+  --focus:        #5aa2e6;
 
   --mood-e:       0.18;
 

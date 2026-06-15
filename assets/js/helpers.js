@@ -69,54 +69,15 @@ const Icon = ({ name, size=16, stroke=1.8, fill=false, style, ...rest }) => (
   </svg>
 );
 
-/* ── Magnetic pointer-tilt surface (3D parallax + cursor glare) ── */
-const Tilt = ({ max=7, lift=3, className="", style, children, ...rest }) => {
-  const ref = React.useRef(null);
-  const raf = React.useRef(0);
-  const onMove = (e) => {
-    const el = ref.current; if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    cancelAnimationFrame(raf.current);
-    raf.current = requestAnimationFrame(() => {
-      const rx = (0.5 - py) * max, ry = (px - 0.5) * max;
-      el.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-${lift}px)`;
-      el.style.setProperty("--gx", (px*100) + "%");
-      el.style.setProperty("--gy", (py*100) + "%");
-    });
-  };
-  const onLeave = () => { const el = ref.current; if (el) el.style.transform = ""; };
-  return (
-    <div ref={ref} className={"kn-tilt " + className} style={style} onMouseMove={onMove} onMouseLeave={onLeave} {...rest}>
-      <div className="kn-tilt-glare" />
-      {children}
-    </div>
-  );
-};
+/* ── Static surface (was magnetic tilt — disabled for performance) ── */
+const Tilt = ({ max, lift, className="", style, children, ...rest }) => (
+  <div className={"kn-tilt " + className} style={style} {...rest}>{children}</div>
+);
 
-/* ── Odometer number: tweens integers, rolls string values ── */
-const AnimatedNumber = ({ value, style, className }) => {
-  const isNum = typeof value === "number" && isFinite(value);
-  const [disp, setDisp] = React.useState(value);
-  const prev = React.useRef(value);
-  const raf = React.useRef(0);
-  React.useEffect(() => {
-    if (!isNum) { setDisp(value); prev.current = value; return; }
-    const from = Number(prev.current) || 0, to = value, start = performance.now(), dur = 650;
-    cancelAnimationFrame(raf.current);
-    const tick = (now) => {
-      const t = Math.min(1, (now - start) / dur);
-      const e = 1 - Math.pow(1 - t, 3);
-      setDisp(Math.round(from + (to - from) * e));
-      if (t < 1) raf.current = requestAnimationFrame(tick); else prev.current = to;
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [value]);
-  if (isNum) return <span className={"kn-roll " + (className||"")} style={style}>{disp}</span>;
-  return <span className={"kn-roll " + (className||"")} style={style}><span className="kn-roll-key" key={String(value)}>{value}</span></span>;
-};
+/* ── Static number (was odometer — renders value directly) ── */
+const AnimatedNumber = ({ value, style, className }) => (
+  <span className={className} style={style}>{value}</span>
+);
 
 Object.assign(window.KN, {
   SANS, MONO, DEFAULT_ROLE_COLORS, FALLBACK_PALETTE, STATUS, STATUS_CYCLE,

@@ -25,7 +25,7 @@ button, input, select, textarea { font-family: var(--font-sans); -webkit-tap-hig
 * { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
 
 /* ── Selection ── */
-::selection { background: hsl(var(--mood-h) var(--mood-s) 55% / 0.24); }
+::selection { background: rgba(10,108,255,0.22); }
 
 /* ── Focus: visible, accessible (replaces the old outline:none) ── */
 :focus { outline: none; }
@@ -44,16 +44,9 @@ input:focus, select:focus, textarea:focus {
 }
 select option { background: var(--surface2); color: var(--text); }
 
-/* ── Theme transition ── */
-body, .theme-transition * {
-  transition: background-color 0.32s var(--ease-smooth), border-color 0.32s var(--ease-smooth), color 0.32s var(--ease-smooth);
-}
-
-/* ── Frosted chrome ── */
+/* ── Opaque chrome (no blur, instant theme switch) ── */
 .kn-header, .kn-nav, .kn-footer {
   background: var(--glass-bg) !important;
-  backdrop-filter: var(--glass);
-  -webkit-backdrop-filter: var(--glass);
 }
 
 /* ── Button helpers ── */
