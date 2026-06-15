@@ -234,11 +234,23 @@
     .kn-footer   { display:none !important; }              /* replaced by bottom nav */
     .kn-content-pad { padding:14px 16px 22px !important; }
 
-    /* Roomier, finger-friendly rows */
-    .kn-task-row { height:54px !important; }
-    .kn-status-badge { font-size:12px !important; padding:5px 11px !important; }
-    .kn-controls { width:100%; margin-left:0 !important; }
-    .kn-controls .kn-search { flex:1 !important; width:auto !important; }
+    /* Card-based task list on phones */
+    .kn-tasks-thead { display:none !important; }
+    .kn-tasks-scroll { padding-bottom:84px !important; }
+    .kn-task-card {
+      margin:9px 13px; border:1px solid var(--border); border-radius:18px;
+      overflow:hidden; background:var(--surface); box-shadow:var(--sh-1);
+      animation:fadeSlide 0.3s var(--ease-smooth) both;
+    }
+    .kn-task-card .kn-task-row { height:62px !important; border-bottom:none !important; padding-right:14px; }
+    .kn-col-status { width:auto !important; padding-left:6px; }     /* let task titles breathe */
+    .kn-col-due    { display:none !important; }                     /* due shown in expanded meta */
+    .kn-status-badge { font-size:12px !important; padding:5px 12px !important; }
+
+    /* Controls: segmented control + flexible search fill the row */
+    .kn-controls { width:100%; margin-left:0 !important; gap:9px !important; }
+    .kn-searchwrap { flex:1 !important; }
+    .kn-searchwrap .kn-search { flex:1 !important; width:auto !important; }
 
     /* Bottom navigation */
     .kn-bottom-nav {
@@ -546,7 +558,7 @@ const TaskRow = ({ task, onStatusChange, onDelete, onEdit }) => {
   const cycleStatus = (e) => { e.stopPropagation(); onStatusChange(task.id, nextStatus); };
 
   return (
-    <div>
+    <div className="kn-task-card">
       <div onClick={() => setOpen(x => !x)} className="kn-task-row" style={{
         display:"flex", alignItems:"center", height:44, paddingRight:14,
         borderLeft:`5px solid ${s.bar}`,
@@ -556,10 +568,10 @@ const TaskRow = ({ task, onStatusChange, onDelete, onEdit }) => {
         <div onClick={e => { e.stopPropagation(); onStatusChange(task.id, isDone ? "pending" : "done"); }}
           style={{ width:15, height:15, border:`1.5px solid ${isDone ? "#22c55e" : "var(--border2)"}`, borderRadius:3, display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, color:"#22c55e", background: isDone ? "rgba(34,197,94,0.14)" : "transparent", flexShrink:0, margin:"0 11px 0 12px", cursor:"pointer", transition:"all 0.15s" }}>{isDone ? "✓" : ""}</div>
         <div style={{ flex:1, fontSize:13.5, fontWeight:isDone ? 400 : 500, color:isDone ? "var(--text4)" : "var(--text)", textDecoration:isDone ? "line-through" : "none", letterSpacing:"-0.01em", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", paddingRight:14 }}>{task.title}</div>
-        <div style={{ width:116 }}><StatusBadge status={task.status} onClick={cycleStatus} /></div>
+        <div className="kn-col-status" style={{ width:116 }}><StatusBadge status={task.status} onClick={cycleStatus} /></div>
         <div className="kn-col-role" style={{ width:70 }}><RoleDot role={task.role} /></div>
         <div className="kn-col-project" style={{ width:126, fontSize:12.5, color:"var(--text4)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{projectName(task.project)}</div>
-        <div style={{ width:56, fontSize:11.5, color:dueCol, textAlign:"right", fontFamily:MONO, fontWeight:500 }}>{dispDate(task.due)}</div>
+        <div className="kn-col-due" style={{ width:56, fontSize:11.5, color:dueCol, textAlign:"right", fontFamily:MONO, fontWeight:500 }}>{dispDate(task.due)}</div>
         <div style={{ width:22, textAlign:"center", fontSize:10, color:"var(--text4)", transition:"transform 0.2s", transform:open?"rotate(180deg)":"rotate(0deg)", flexShrink:0 }}>▾</div>
       </div>
       {open && (
@@ -619,8 +631,8 @@ const TasksView = ({ tasks, onStatusChange, onDelete, onEdit, filter, search }) 
 
   const HEAD = { fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)" };
   return (
-    <div style={{ flex:1, overflow:"auto", minHeight:0 }}>
-      <div style={{ height:28, display:"flex", alignItems:"center", paddingLeft:5, paddingRight:14, background:"var(--surface2)", borderBottom:"1px solid var(--border)", position:"sticky", top:0, zIndex:10, flexShrink:0 }}>
+    <div className="kn-tasks-scroll" style={{ flex:1, overflow:"auto", minHeight:0 }}>
+      <div className="kn-tasks-thead" style={{ height:28, display:"flex", alignItems:"center", paddingLeft:5, paddingRight:14, background:"var(--surface2)", borderBottom:"1px solid var(--border)", position:"sticky", top:0, zIndex:10, flexShrink:0 }}>
         <div style={{ width:44 }}></div>
         <div style={{ flex:1, ...HEAD }}>Task</div>
         <div style={{ width:116, ...HEAD }}>Status</div>
@@ -660,10 +672,10 @@ const TasksView = ({ tasks, onStatusChange, onDelete, onEdit, filter, search }) 
 
 /* ── Projects view ── */
 const ProjectsView = ({ projects, tasks, onEdit, onDelete, onAddTask }) => (
-  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
+  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
     {projects.length === 0 && <div style={{ padding:"48px 20px", textAlign:"center", color:"var(--text4)", fontSize:13 }}>No projects yet — use “+ New Project” to create one</div>}
-    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))", gap:14 }}>
-      {projects.map(p => {
+    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))", gap:16 }}>
+      {projects.map((p, i) => {
         const pt = tasks.filter(t => t.project === p.id);
         const total = pt.length;
         const done = pt.filter(t => t.status === "done").length;
@@ -673,9 +685,9 @@ const ProjectsView = ({ projects, tasks, onEdit, onDelete, onAddTask }) => (
         const due = upcoming ? dispDate(upcoming.due) : "—";
         const barColor = blocked > 0 ? "#f97316" : progress > 70 ? "#22c55e" : "#1c5caa";
         return (
-          <div key={p.id} className="kn-lift" style={{ background:`linear-gradient(105deg,${barColor}0d 0%,var(--surface) 56%)`, border:"1px solid var(--border)", borderLeft:`5px solid ${barColor}`, borderRadius:"var(--r-md)", padding:"16px 18px", cursor:"default", boxShadow:"var(--sh-1)" }}>
-            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:5 }}>
-              <div style={{ fontSize:13.5, fontWeight:700, color:"var(--text)", lineHeight:1.35, flex:1, minWidth:0 }}>{p.name}</div>
+          <div key={p.id} className="kn-lift" style={{ background:`linear-gradient(105deg,${barColor}0d 0%,var(--surface) 56%)`, border:"1px solid var(--border)", borderLeft:`5px solid ${barColor}`, borderRadius:"var(--r-lg)", padding:"18px 20px", cursor:"default", boxShadow:"var(--sh-1)", animation:`fadeSlide 0.34s var(--ease-smooth) ${Math.min(i,9)*0.035}s both` }}>
+            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:6 }}>
+              <div style={{ fontSize:15, fontWeight:700, color:"var(--text)", lineHeight:1.35, flex:1, minWidth:0, letterSpacing:"-0.01em" }}>{p.name}</div>
               <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
                 {blocked > 0 && (
                   <span style={{ fontSize:10, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"rgba(249,115,22,0.12)", color:"#f97316", border:"1px solid rgba(249,115,22,0.25)", whiteSpace:"nowrap" }}>{blocked} blocked</span>
@@ -714,25 +726,25 @@ const PaymentsView = ({ payments, onToggle, onEdit, onDelete }) => {
   const received = sum(p => statusOf(p) === "received");
   const overdue = sum(p => statusOf(p) === "overdue");
   return (
-    <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
-      <div className="kn-pay-tiles" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:18 }}>
+    <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
+      <div className="kn-pay-tiles" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:22 }}>
         {[
           { label:"Outstanding", value:fmtMoney(outstanding), color:"var(--accent-hover)", bar:"var(--accent)" },
           { label:"Received",    value:fmtMoney(received),    color:"#22c55e",             bar:"#22c55e" },
           { label:"Overdue",     value:fmtMoney(overdue),     color:"#c8281e",             bar:"#c8281e" },
         ].map(tile => (
           <div key={tile.label} className="kn-lift" style={{ padding:"15px 18px", background:`linear-gradient(105deg,${tile.bar}10 0%,var(--surface) 60%)`, border:"1px solid var(--border)", borderLeft:`5px solid ${tile.bar}`, borderRadius:"var(--r-md)", boxShadow:"var(--sh-1)" }}>
-            <div style={{ fontSize:9.5, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)", marginBottom:5 }}>{tile.label}</div>
-            <div style={{ fontSize:24, fontWeight:800, color:tile.color, fontFamily:MONO, letterSpacing:"-0.03em" }}>{tile.value}</div>
+            <div style={{ fontSize:9.5, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)", marginBottom:7 }}>{tile.label}</div>
+            <div style={{ fontSize:28, fontWeight:800, color:tile.color, fontFamily:MONO, letterSpacing:"-0.03em" }}>{tile.value}</div>
           </div>
         ))}
       </div>
       {payments.length === 0 && <div style={{ padding:"32px 20px", textAlign:"center", color:"var(--text4)", fontSize:13 }}>No payments recorded</div>}
-      {payments.map(p => {
+      {payments.map((p, i) => {
         const st = statusOf(p);
         const sc = st === "received" ? "#22c55e" : st === "overdue" ? "#c8281e" : "#f59e0b";
         return (
-          <div key={p.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"13px 16px", marginBottom:7, background:`linear-gradient(90deg,${sc}09 0%,var(--surface) 180px)`, border:"1px solid var(--border)", borderLeft:`5px solid ${sc}`, borderRadius:"var(--r-sm)", boxShadow:"var(--sh-1)" }}>
+          <div key={p.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 17px", marginBottom:8, background:`linear-gradient(90deg,${sc}09 0%,var(--surface) 180px)`, border:"1px solid var(--border)", borderLeft:`5px solid ${sc}`, borderRadius:"var(--r-md)", boxShadow:"var(--sh-1)", animation:`fadeSlide 0.3s var(--ease-smooth) ${Math.min(i,9)*0.03}s both` }}>
             <div style={{ flex:1, minWidth:0 }}>
               <div style={{ fontSize:13.5, fontWeight:600, color:"var(--text)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.client || "—"}</div>
               {p.notes ? <div style={{ fontSize:11, color:"var(--text4)", fontFamily:MONO, marginTop:2 }}>{p.notes}</div> : null}
@@ -753,7 +765,7 @@ const PaymentsView = ({ payments, onToggle, onEdit, onDelete }) => {
 
 /* ── Decisions view ── */
 const DecisionsView = ({ decisions, onEdit, onDelete }) => (
-  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
+  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
     <div style={{ maxWidth:820 }}>
       {decisions.length === 0 && <div style={{ padding:"32px 0", color:"var(--text4)", fontSize:13 }}>No decisions logged yet — use “+ New Decision” to log one</div>}
       {decisions.map((d, i) => {
@@ -769,7 +781,7 @@ const DecisionsView = ({ decisions, onEdit, onDelete }) => (
             </div>
             <div style={{ width:2, background:"var(--border)", borderRadius:2, flexShrink:0, alignSelf:"stretch", minHeight:20 }}></div>
             <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontSize:13.5, color:"var(--text)", lineHeight:1.7 }}>{d.note || d.text || ""}</div>
+              <div style={{ fontSize:14.5, color:"var(--text)", lineHeight:1.7, letterSpacing:"-0.005em" }}>{d.note || d.text || ""}</div>
             </div>
             <div style={{ display:"flex", gap:6, flexShrink:0, alignItems:"flex-start", paddingTop:1 }}>
               <IconBtn icon="✎" title="Edit decision" onClick={() => onEdit(d)} />
@@ -1094,7 +1106,7 @@ const App = () => {
           {metrics.map(m => (
             <div key={m.l} style={{ display:"flex", flexDirection:"column", gap:1, cursor:"default" }}>
               <div style={{ fontSize:9, fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", color:"var(--text4)" }}>{m.l}</div>
-              <div style={{ fontSize:22, fontWeight:800, color:m.c, lineHeight:1, letterSpacing:"-0.04em", fontFamily:MONO }}>{m.v}</div>
+              <div style={{ fontSize:23.5, fontWeight:800, color:m.c, lineHeight:1, letterSpacing:"-0.04em", fontFamily:MONO }}>{m.v}</div>
             </div>
           ))}
         </div>
@@ -1121,13 +1133,18 @@ const App = () => {
           ))}
         </div>
         {tab === "tasks" && (
-          <div className="kn-controls" style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:5, animation:"slideDown 0.18s ease both" }}>
-            {[["all","All"],["overdue","Overdue"],["blocked","Blocked"]].map(([val,lbl]) => (
-              <button key={val} onClick={() => setFilter(val)} style={{ height:26, padding:"0 10px", cursor:"pointer", border: filter === val ? "1.5px solid var(--text)" : "1px solid var(--border)", borderRadius:3, fontSize:11.5, fontWeight:filter === val ? 700 : 500, color: filter === val ? "var(--text)" : "var(--text3)", background: filter === val ? "var(--surface2)" : "transparent", fontFamily:SANS, transition:"all 0.12s" }}>{lbl}</button>
-            ))}
-            <div style={{ display:"flex", alignItems:"center", height:26, border:"1px solid var(--border)", borderRadius:3, overflow:"hidden", background:"var(--surface2)", marginLeft:2 }}>
-              <span style={{ padding:"0 7px", fontSize:11, color:"var(--text4)", flexShrink:0, fontFamily:MONO }}>/</span>
-              <input id="kn-search" className="kn-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" style={{ border:"none", background:"transparent", color:"var(--text)", fontFamily:SANS, fontSize:12.5, padding:"0 8px 0 0", outline:"none", width:140, height:"100%" }} />
+          <div className="kn-controls" style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:8, animation:"slideDown 0.18s ease both" }}>
+            <div className="kn-segment" style={{ display:"flex", alignItems:"center", gap:2, flexShrink:0, background:"var(--surface2)", border:"1px solid var(--border)", borderRadius:999, padding:3, height:32 }}>
+              {[["all","All"],["overdue","Overdue"],["blocked","Blocked"]].map(([val,lbl]) => {
+                const on = filter === val;
+                return (
+                  <button key={val} onClick={() => setFilter(val)} className="kn-press" style={{ height:"100%", padding:"0 14px", cursor:"pointer", border:"none", borderRadius:999, fontSize:12, fontWeight:on ? 700 : 500, color: on ? "var(--text)" : "var(--text3)", background: on ? "var(--surface)" : "transparent", boxShadow: on ? "var(--sh-1)" : "none", fontFamily:SANS, transition:"all 0.2s var(--ease-smooth)", whiteSpace:"nowrap" }}>{lbl}</button>
+                );
+              })}
+            </div>
+            <div className="kn-searchwrap" style={{ display:"flex", alignItems:"center", height:32, border:"1px solid var(--border)", borderRadius:999, overflow:"hidden", background:"var(--surface2)", paddingLeft:11 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text4)" strokeWidth="2.4" strokeLinecap="round" style={{ flexShrink:0 }}><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input id="kn-search" className="kn-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search" style={{ border:"none", background:"transparent", color:"var(--text)", fontFamily:SANS, fontSize:16, padding:"0 13px 0 8px", outline:"none", width:150, height:"100%" }} />
             </div>
           </div>
         )}
