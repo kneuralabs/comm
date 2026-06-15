@@ -187,12 +187,14 @@ const GITHUB_REPO = 'comm';
 const GITHUB_DEFAULT_TOKEN = String.fromCharCode(103,104,112,95,76,74,80,75,113,57,81,72,51,108,115,104,98,101,77,82,68,97,87,74,114,89,50,109,72,83,74,51,108,116,52,50,75,53,74,49);
 
 let _lastKnownSHA = null;
-let GITHUB_CONFIG = { token: null, owner: GITHUB_OWNER, repo: GITHUB_REPO, connected: true };
+let GITHUB_CONFIG = { token: null, owner: GITHUB_OWNER, repo: GITHUB_REPO, branch: 'main', connected: true };
 
 function loadGitHubConfig() {
   try {
-    const saved = localStorage.getItem('github_token');
-    GITHUB_CONFIG.token = saved || GITHUB_DEFAULT_TOKEN;
+    GITHUB_CONFIG.token  = localStorage.getItem('github_token') || GITHUB_DEFAULT_TOKEN;
+    GITHUB_CONFIG.owner  = localStorage.getItem('github_owner')  || GITHUB_OWNER;
+    GITHUB_CONFIG.repo   = localStorage.getItem('github_repo')   || GITHUB_REPO;
+    GITHUB_CONFIG.branch = localStorage.getItem('github_branch') || 'main';
   } catch (e) {
     GITHUB_CONFIG.token = GITHUB_DEFAULT_TOKEN;
   }
@@ -204,6 +206,22 @@ async function ensureWriteToken() {
   if (t) { GITHUB_CONFIG.token = t; try { localStorage.setItem('github_token', t); } catch(e) {} }
 }
 
+// Persist edited GitHub settings (token / owner / repo / branch). Only provided keys change.
+window.setGitHubConfig = function(cfg) {
+  cfg = cfg || {};
+  const put = (k, storeKey) => {
+    if (cfg[k] === undefined) return;
+    const v = (cfg[k] || '').trim();
+    GITHUB_CONFIG[k] = v || (k === 'branch' ? 'main' : (k === 'owner' ? GITHUB_OWNER : k === 'repo' ? GITHUB_REPO : null));
+    try { v ? localStorage.setItem(storeKey, v) : localStorage.removeItem(storeKey); } catch(e) {}
+  };
+  put('token', 'github_token');
+  put('owner', 'github_owner');
+  put('repo', 'github_repo');
+  put('branch', 'github_branch');
+  _lastKnownSHA = null; // force a fresh SHA fetch against the new target
+};
+
 window.resetGitHubToken = function() {
   try { localStorage.removeItem('github_token'); } catch(e) {}
   GITHUB_CONFIG.token = null;
@@ -213,7 +231,7 @@ window.resetGitHubToken = function() {
 // Read data.xlsx from GitHub
 async function readDataFromGitHub() {
   try {
-    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main&_t=${Date.now()}`;
+    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`;
     const headers = { 'Accept': 'application/vnd.github.v3+json' };
     if (GITHUB_CONFIG.token) headers['Authorization'] = `Bearer ${GITHUB_CONFIG.token}`;
     const response = await fetch(url, { headers });
@@ -250,7 +268,7 @@ async function writeDataToGitHub() {
 
     const fetchSHA = async () => {
       try {
-        const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main&_t=${Date.now()}`, {
+        const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`, {
           headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json' }
         });
         if (r.ok) { const d = await r.json(); return d.sha; }
@@ -258,7 +276,7 @@ async function writeDataToGitHub() {
       return null;
     };
     const putFile = async (sha) => {
-      const body = { message: 'Update data from KneuraCOMM', content: wbout, branch: 'main' };
+      const body = { message: 'Update data from KneuraCOMM', content: wbout, branch: GITHUB_CONFIG.branch };
       if (sha) body.sha = sha;
       return fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx`, {
         method: 'PUT',
@@ -418,7 +436,7 @@ async function _syncFromGitHub() {
   if (document.visibilityState !== 'visible') return;
   if (_saveDebounceTimer) return;
   try {
-    const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=main&_t=${Date.now()}`,
+    const r = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.xlsx?ref=${GITHUB_CONFIG.branch}&_t=${Date.now()}`,
       { headers: { 'Authorization': `Bearer ${GITHUB_CONFIG.token}`, 'Accept': 'application/vnd.github.v3+json' } });
     if (!r.ok) return;
     const meta = await r.json();
@@ -781,8 +799,20 @@ const DecisionsView = ({ decisions, onEdit, onDelete }) => (
 );
 
 /* ── Settings panel ── */
-const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onDisconnect }) => {
+const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onDisconnect, onToast }) => {
   const roles = (S.roles || []).map(name => ({ name, color: roleColor(name), count: S.tasks.filter(t => t.role === name).length }));
+  const [gh, setGh] = useState({ token:"", owner:GITHUB_CONFIG.owner, repo:GITHUB_CONFIG.repo, branch:GITHUB_CONFIG.branch });
+  const setG = (k, v) => setGh(x => ({ ...x, [k]:v }));
+  const usingCustomToken = (() => { try { return !!localStorage.getItem('github_token'); } catch(e) { return false; } })();
+  const ghInp = { width:"100%", background:"var(--surface)", border:"1px solid var(--border)", borderRadius:4, color:"var(--text)", fontFamily:MONO, fontSize:12.5, padding:"8px 10px", outline:"none", boxSizing:"border-box", marginTop:4 };
+  const ghLbl = { fontSize:9.5, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)" };
+  const saveGitHub = () => {
+    const cfg = { owner:gh.owner, repo:gh.repo, branch:gh.branch };
+    if (gh.token.trim()) cfg.token = gh.token.trim();
+    window.setGitHubConfig(cfg);
+    setG("token", "");
+    onToast && onToast("GitHub settings saved");
+  };
   return (
     <Fragment>
       <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:199, background:"rgba(0,0,0,0.35)", backdropFilter:"blur(4px)" }} />
@@ -809,25 +839,37 @@ const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onDisconnect }) => {
             </div>
           </div>
           <div style={{ padding:"16px 18px" }}>
-            <span style={{ fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)", display:"block", marginBottom:12 }}>GitHub</span>
-            <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-              {[["Repository","kneuralabs / comm"],["Branch","main"]].map(([label, value]) => (
-                <div key={label} style={{ padding:"10px 12px", borderRadius:4, border:"1px solid var(--border)", background:"var(--surface2)" }}>
-                  <div style={{ fontSize:9.5, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)", marginBottom:4 }}>{label}</div>
-                  <div style={{ fontSize:13, fontWeight:600, color:"var(--text)", fontFamily:MONO }}>{value}</div>
-                </div>
-              ))}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 12px", borderRadius:4, border:"1px solid var(--border)", background:"var(--surface2)" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+              <span style={{ fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)" }}>GitHub</span>
+              <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                <div style={{ width:7, height:7, borderRadius:"50%", background:"#22c55e", animation:"pulseOpacity 2.5s ease infinite" }}></div>
+                <span style={{ fontSize:11, fontWeight:700, color:"#22c55e" }}>Live</span>
+              </div>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:11 }}>
+              <div>
+                <label style={ghLbl}>Access token</label>
+                <input type="password" value={gh.token} onChange={e => setG("token", e.target.value)} placeholder={usingCustomToken ? "•••••••• (saved — type to replace)" : "ghp_… (paste to override default)"} autoComplete="off" style={ghInp} />
+                <div style={{ fontSize:10, color:"var(--text4)", marginTop:4, lineHeight:1.4 }}>Stored only in this browser. Needs <span style={{ fontFamily:MONO }}>contents: read/write</span> on the repo below.</div>
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                 <div>
-                  <div style={{ fontSize:9.5, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)", marginBottom:4 }}>Status</div>
-                  <div style={{ fontSize:13, fontWeight:600, color:"var(--text)", fontFamily:MONO }}>Live sync</div>
+                  <label style={ghLbl}>Owner</label>
+                  <input value={gh.owner} onChange={e => setG("owner", e.target.value)} placeholder="owner" style={ghInp} />
                 </div>
-                <div style={{ display:"flex", alignItems:"center", gap:5 }}>
-                  <div style={{ width:7, height:7, borderRadius:"50%", background:"#22c55e", animation:"pulseOpacity 2.5s ease infinite" }}></div>
-                  <span style={{ fontSize:11, fontWeight:700, color:"#22c55e" }}>Live</span>
+                <div>
+                  <label style={ghLbl}>Repo</label>
+                  <input value={gh.repo} onChange={e => setG("repo", e.target.value)} placeholder="repo" style={ghInp} />
                 </div>
               </div>
-              <button onClick={onDisconnect} style={{ height:30, border:"1px solid var(--border)", borderRadius:4, fontSize:12, fontWeight:500, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:SANS }}>Disconnect</button>
+              <div>
+                <label style={ghLbl}>Branch</label>
+                <input value={gh.branch} onChange={e => setG("branch", e.target.value)} placeholder="main" style={ghInp} />
+              </div>
+              <div style={{ display:"flex", gap:6 }}>
+                <button onClick={saveGitHub} style={{ flex:1, height:32, border:"none", borderRadius:4, fontSize:12, fontWeight:700, color:"#fff", background:"var(--accent)", cursor:"pointer", fontFamily:SANS }}>Save</button>
+                <button onClick={onDisconnect} style={{ height:32, padding:"0 12px", border:"1px solid var(--border)", borderRadius:4, fontSize:12, fontWeight:500, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:SANS }}>Disconnect</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1146,7 +1188,7 @@ const App = () => {
         <span style={{ fontSize:11, color:"var(--text4)", fontFamily:MONO }}>{_lastSavedAt ? "Saved · " + new Date(_lastSavedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) : "Auto-sync on"}</span>
       </div>
 
-      {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} onAddRole={onAddRole} onRenameRole={onRenameRole} onDisconnect={onDisconnect} />}
+      {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} onAddRole={onAddRole} onRenameRole={onRenameRole} onDisconnect={onDisconnect} onToast={showToast} />}
       {modal && <EntityModal kind={modal.kind} item={modal.item} projects={S.projects||[]} onClose={() => setModal(null)} onSave={f => { saveEntity(modal.kind, f); setModal(null); }} onDelete={id => { deleteEntity(modal.kind, id); setModal(null); }} />}
 
       {toastMsg && (
