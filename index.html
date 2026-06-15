@@ -123,6 +123,40 @@
   /* Button hover states */
   .btn-ghost:hover { background:var(--surface2) !important; color:var(--text) !important; }
   .nav-tab:hover   { color:var(--text2) !important; }
+
+  /* Hide-on-desktop helper (per-row meta for compact layouts) */
+  .kn-row-meta { display:none; }
+
+  /* Hide horizontal scrollbars on the strips that scroll on touch */
+  .kn-metrics, .kn-nav { scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .kn-metrics::-webkit-scrollbar, .kn-nav::-webkit-scrollbar { display:none; }
+
+  /* ── Tablet / phone (portrait tablets + all phones) ── */
+  @media (max-width: 860px) {
+    .kn-header   { padding:0 12px !important; gap:12px !important; }
+    .kn-divider  { display:none !important; }
+    .kn-metrics  { gap:18px !important; flex:1; overflow-x:auto; padding:0 2px; }
+    .kn-metrics > div { flex-shrink:0; }
+    .kn-save-btn { display:none !important; }
+    .kn-nav      { padding:0 12px !important; overflow-x:auto; }
+    .kn-controls { margin-left:10px !important; }
+    .kn-content-pad { padding-left:12px !important; padding-right:12px !important; }
+    .kn-footer   { padding:0 12px !important; }
+    .kn-footer-keys { display:none !important; }
+    .kn-col-role, .kn-col-project { display:none !important; }
+    .kn-row-meta { display:flex !important; }
+    .kn-pay-tiles { grid-template-columns:1fr 1fr !important; }
+    .kn-pay-tiles > div:last-child { grid-column:1 / -1; }
+    .kn-pay-tiles > div > div:last-child { font-size:20px !important; }
+  }
+
+  /* ── Narrow phones ── */
+  @media (max-width: 420px) {
+    .kn-metrics  { gap:14px !important; }
+    .kn-newtask  { padding:0 11px !important; font-size:0 !important; }
+    .kn-newtask::before { content:"+ New"; font-size:12.5px; }
+    .kn-search   { width:96px !important; }
+  }
 </style>
 </head>
 <body>
@@ -515,13 +549,18 @@ const TaskRow = ({ task, onStatusChange, onDelete }) => {
           style={{ width:15, height:15, border:`1.5px solid ${isDone ? "#22c55e" : "var(--border2)"}`, borderRadius:3, display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, color:"#22c55e", background: isDone ? "rgba(34,197,94,0.14)" : "transparent", flexShrink:0, margin:"0 11px 0 12px", cursor:"pointer", transition:"all 0.15s" }}>{isDone ? "✓" : ""}</div>
         <div style={{ flex:1, fontSize:13.5, fontWeight:isDone ? 400 : 500, color:isDone ? "var(--text4)" : "var(--text)", textDecoration:isDone ? "line-through" : "none", letterSpacing:"-0.01em", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", paddingRight:14 }}>{task.title}</div>
         <div style={{ width:116 }}><StatusBadge status={task.status} onClick={cycleStatus} /></div>
-        <div style={{ width:70 }}><RoleDot role={task.role} /></div>
-        <div style={{ width:126, fontSize:12.5, color:"var(--text4)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{projectName(task.project)}</div>
+        <div className="kn-col-role" style={{ width:70 }}><RoleDot role={task.role} /></div>
+        <div className="kn-col-project" style={{ width:126, fontSize:12.5, color:"var(--text4)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{projectName(task.project)}</div>
         <div style={{ width:56, fontSize:11.5, color:dueCol, textAlign:"right", fontFamily:MONO, fontWeight:500 }}>{dispDate(task.due)}</div>
         <div style={{ width:22, textAlign:"center", fontSize:10, color:"var(--text4)", transition:"transform 0.2s", transform:open?"rotate(180deg)":"rotate(0deg)", flexShrink:0 }}>▾</div>
       </div>
       {open && (
         <div style={{ borderLeft:`5px solid ${s.bar}`, borderBottom:"1px solid var(--line)", background:`linear-gradient(90deg,${s.bar}0a 0%,var(--surface) 220px)`, padding:"10px 14px 14px 42px", animation:"fadeSlide 0.18s ease both" }}>
+          <div className="kn-row-meta" style={{ alignItems:"center", gap:14, marginBottom:9, flexWrap:"wrap" }}>
+            <RoleDot role={task.role} />
+            <span style={{ fontSize:12, color:"var(--text3)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"60%" }}>{projectName(task.project)}</span>
+            {task.due ? <span style={{ fontSize:11.5, color:dueCol, fontFamily:MONO, fontWeight:500 }}>{dispDate(task.due)}</span> : null}
+          </div>
           {task.nextAction ? (
             <div style={{ display:"flex", gap:8, marginBottom:6, alignItems:"flex-start" }}>
               <span style={{ fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--accent-hover)", flexShrink:0, marginTop:2 }}>→ NEXT</span>
@@ -576,8 +615,8 @@ const TasksView = ({ tasks, onStatusChange, onDelete, filter, search }) => {
         <div style={{ width:44 }}></div>
         <div style={{ flex:1, ...HEAD }}>Task</div>
         <div style={{ width:116, ...HEAD }}>Status</div>
-        <div style={{ width:70, ...HEAD }}>Role</div>
-        <div style={{ width:126, ...HEAD }}>Project</div>
+        <div className="kn-col-role" style={{ width:70, ...HEAD }}>Role</div>
+        <div className="kn-col-project" style={{ width:126, ...HEAD }}>Project</div>
         <div style={{ width:56, ...HEAD, textAlign:"right" }}>Due</div>
         <div style={{ width:22 }}></div>
       </div>
@@ -612,7 +651,7 @@ const TasksView = ({ tasks, onStatusChange, onDelete, filter, search }) => {
 
 /* ── Projects view ── */
 const ProjectsView = ({ projects, tasks }) => (
-  <div style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
+  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
     {projects.length === 0 && <div style={{ padding:"48px 20px", textAlign:"center", color:"var(--text4)", fontSize:13 }}>No projects yet</div>}
     <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:10 }}>
       {projects.map(p => {
@@ -661,8 +700,8 @@ const PaymentsView = ({ payments, onToggle }) => {
   const received = sum(p => statusOf(p) === "received");
   const overdue = sum(p => statusOf(p) === "overdue");
   return (
-    <div style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:18 }}>
+    <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
+      <div className="kn-pay-tiles" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:18 }}>
         {[
           { label:"Outstanding", value:fmtMoney(outstanding), color:"var(--accent-hover)", bar:"var(--accent)" },
           { label:"Received",    value:fmtMoney(received),    color:"#22c55e",             bar:"#22c55e" },
@@ -698,7 +737,7 @@ const PaymentsView = ({ payments, onToggle }) => {
 
 /* ── Decisions view ── */
 const DecisionsView = ({ decisions }) => (
-  <div style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
+  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
     <div style={{ maxWidth:820 }}>
       {decisions.length === 0 && <div style={{ padding:"32px 0", color:"var(--text4)", fontSize:13 }}>No decisions logged yet</div>}
       {decisions.map((d, i) => {
@@ -945,7 +984,7 @@ const App = () => {
       <div style={{ height:2, background:"var(--red)", flexShrink:0 }}></div>
 
       {/* HEADER */}
-      <div style={{ height:62, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
+      <div className="kn-header" style={{ height:62, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:9, flexShrink:0 }}>
           <img src="LOGO.png" alt="Kneura" style={{ height:34, width:34, borderRadius:5, objectFit:"cover", display:"block" }} />
           <div>
@@ -957,8 +996,8 @@ const App = () => {
             <div style={{ fontSize:9.5, color:"var(--text4)", letterSpacing:"0.07em", textTransform:"uppercase", fontWeight:600, marginTop:3 }}>Command Centre</div>
           </div>
         </div>
-        <div style={{ width:1, height:34, background:"var(--border)", margin:"0 22px", flexShrink:0 }}></div>
-        <div style={{ display:"flex", gap:26, flex:1, alignItems:"center" }}>
+        <div className="kn-divider" style={{ width:1, height:34, background:"var(--border)", margin:"0 22px", flexShrink:0 }}></div>
+        <div className="kn-metrics" style={{ display:"flex", gap:26, flex:1, alignItems:"center" }}>
           {metrics.map(m => (
             <div key={m.l} style={{ display:"flex", flexDirection:"column", gap:1, cursor:"default" }}>
               <div style={{ fontSize:9, fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", color:"var(--text4)" }}>{m.l}</div>
@@ -967,8 +1006,8 @@ const App = () => {
           ))}
         </div>
         <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
-          <button onClick={() => setNewTaskOpen(true)} style={{ height:34, padding:"0 15px", border:"none", borderRadius:5, fontSize:12.5, fontWeight:700, background:"var(--accent)", color:"#fff", cursor:"pointer", fontFamily:SANS, letterSpacing:"0.01em", transition:"background 0.15s" }}>+ New Task</button>
-          <button onClick={() => { manualSave(); showToast("Saved"); }} style={{ height:34, padding:"0 12px", border:"1px solid var(--border)", borderRadius:5, fontSize:12, fontWeight:500, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:MONO, transition:"all 0.12s" }}>⌘S</button>
+          <button className="kn-newtask" onClick={() => setNewTaskOpen(true)} style={{ height:34, padding:"0 15px", border:"none", borderRadius:5, fontSize:12.5, fontWeight:700, background:"var(--accent)", color:"#fff", cursor:"pointer", fontFamily:SANS, letterSpacing:"0.01em", transition:"background 0.15s", whiteSpace:"nowrap" }}>+ New Task</button>
+          <button className="kn-save-btn" onClick={() => { manualSave(); showToast("Saved"); }} style={{ height:34, padding:"0 12px", border:"1px solid var(--border)", borderRadius:5, fontSize:12, fontWeight:500, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:MONO, transition:"all 0.12s" }}>⌘S</button>
           <button onClick={() => setSettingsOpen(o => !o)} style={{ width:34, height:34, borderRadius:5, border:`1px solid ${settingsOpen ? "var(--accent)" : "var(--border)"}`, background: settingsOpen ? "rgba(28,92,170,0.12)" : "transparent", color: settingsOpen ? "var(--accent-hover)" : "var(--text3)", cursor:"pointer", fontSize:15, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:SANS, transition:"all 0.15s" }}>⚙</button>
           <button onClick={() => setDark(d => !d)} title={dark ? "Switch to light" : "Switch to dark"} style={{ width:30, height:30, borderRadius:"50%", border:"1.5px solid var(--border)", background:"transparent", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"border-color 0.18s", flexShrink:0 }}>
             <div style={{ width:10, height:10, borderRadius:"50%", background: dark ? "var(--text)" : "transparent", border: dark ? "none" : "2px solid var(--text)", transition:"all 0.18s" }}></div>
@@ -977,7 +1016,7 @@ const App = () => {
       </div>
 
       {/* NAV TABS + CONTROLS */}
-      <div style={{ height:40, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"stretch", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
+      <div className="kn-nav" style={{ height:40, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"stretch", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
         <div style={{ display:"flex", height:"100%" }}>
           {TABS.map(({ key, label, count }) => (
             <button key={key} className="nav-tab" onClick={() => { setTab(key); setFilter("all"); setSearch(""); }} style={{ display:"flex", alignItems:"center", gap:5, padding:"0 15px", fontSize:12.5, fontWeight:tab === key ? 700 : 500, color: tab === key ? "var(--text)" : "var(--text3)", background:"transparent", border:"none", borderBottom: tab === key ? "2px solid var(--accent)" : "2px solid transparent", cursor:"pointer", fontFamily:SANS, letterSpacing:"-0.01em", transition:"color 0.15s", whiteSpace:"nowrap" }}>
@@ -989,13 +1028,13 @@ const App = () => {
           ))}
         </div>
         {tab === "tasks" && (
-          <div style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:5, animation:"slideDown 0.18s ease both" }}>
+          <div className="kn-controls" style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:5, animation:"slideDown 0.18s ease both" }}>
             {[["all","All"],["overdue","Overdue"],["blocked","Blocked"]].map(([val,lbl]) => (
               <button key={val} onClick={() => setFilter(val)} style={{ height:26, padding:"0 10px", cursor:"pointer", border: filter === val ? "1.5px solid var(--text)" : "1px solid var(--border)", borderRadius:3, fontSize:11.5, fontWeight:filter === val ? 700 : 500, color: filter === val ? "var(--text)" : "var(--text3)", background: filter === val ? "var(--surface2)" : "transparent", fontFamily:SANS, transition:"all 0.12s" }}>{lbl}</button>
             ))}
             <div style={{ display:"flex", alignItems:"center", height:26, border:"1px solid var(--border)", borderRadius:3, overflow:"hidden", background:"var(--surface2)", marginLeft:2 }}>
               <span style={{ padding:"0 7px", fontSize:11, color:"var(--text4)", flexShrink:0, fontFamily:MONO }}>/</span>
-              <input id="kn-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" style={{ border:"none", background:"transparent", color:"var(--text)", fontFamily:SANS, fontSize:12.5, padding:"0 8px 0 0", outline:"none", width:140, height:"100%" }} />
+              <input id="kn-search" className="kn-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" style={{ border:"none", background:"transparent", color:"var(--text)", fontFamily:SANS, fontSize:12.5, padding:"0 8px 0 0", outline:"none", width:140, height:"100%" }} />
             </div>
           </div>
         )}
@@ -1010,8 +1049,8 @@ const App = () => {
       </div>
 
       {/* FOOTER HINTS */}
-      <div style={{ height:30, borderTop:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 20px", background:"var(--surface)", flexShrink:0, justifyContent:"space-between" }}>
-        <div style={{ display:"flex", gap:14, alignItems:"center" }}>
+      <div className="kn-footer" style={{ height:30, borderTop:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 20px", background:"var(--surface)", flexShrink:0, justifyContent:"space-between" }}>
+        <div className="kn-footer-keys" style={{ display:"flex", gap:14, alignItems:"center" }}>
           <Kbd k="N" label="new" />
           <Kbd k="/" label="search" />
           <Kbd k="⌘S" label="save" />
