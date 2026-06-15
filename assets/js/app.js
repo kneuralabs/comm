@@ -201,14 +201,14 @@ const App = () => {
                 <span style={{ color:"var(--accent)" }}>COMM</span>
                 <span style={{ fontSize:8, color:"var(--text4)", marginLeft:1, lineHeight:1 }}>™</span>
               </div>
-              <div style={{ fontSize:"var(--fs-overline)", color:"var(--text4)", letterSpacing:"0.07em", textTransform:"uppercase", fontWeight:600, marginTop:3 }}>Command Centre</div>
+              <div className="kn-subtitle" style={{ fontSize:"var(--fs-overline)", color:"var(--text4)", letterSpacing:"0.07em", textTransform:"uppercase", fontWeight:600, marginTop:3 }}>Command Centre</div>
             </div>
           </div>
           <div className="kn-divider" style={{ width:1, height:34, background:"var(--border)", margin:"0 22px", flexShrink:0 }} />
           <div className="kn-metrics" style={{ display:"flex", gap:26, flex:1, alignItems:"center" }}>
             {metrics.map(m => (
               <div key={m.l} style={{ display:"flex", flexDirection:"column", gap:2, cursor:"default" }}>
-                <div style={{ fontSize:"var(--fs-overline)", fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", color:"var(--text4)" }}>{m.l}</div>
+                <div style={{ fontSize:"var(--fs-overline)", fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", color:"var(--text4)", whiteSpace:"nowrap" }}>{m.l}</div>
                 <AnimatedNumber value={m.v} className="kn-num" style={{ fontSize:"var(--fs-2xl)", fontWeight:800, color:m.c, lineHeight:1, letterSpacing:"-0.04em" }} />
               </div>
             ))}
@@ -216,7 +216,7 @@ const App = () => {
           <div style={{ display:"flex", gap:7, alignItems:"center", flexShrink:0 }}>
             <button className="kn-newtask kn-press" onClick={startNew} style={{ display:"inline-flex", alignItems:"center", gap:6, height:37, padding:"0 16px", border:"none", borderRadius:"var(--r-sm)", fontSize:"var(--fs-xs)", fontWeight:700, background:"var(--accent)", color:"var(--accent-ink)", cursor:"pointer", fontFamily:APP_SANS, boxShadow:"0 3px 14px hsl(var(--mood-h) 80% 45% / 0.34)", transition:"background 0.15s, box-shadow 0.15s", whiteSpace:"nowrap" }}><Icon name="plus" size={15} /> New {ENTITY_LABEL[tab.slice(0,-1)]}</button>
             <button onClick={() => setPaletteOpen(true)} title="Command palette (⌘K)" aria-label="Open command palette" className="kn-save-btn kn-press kn-hit" style={{ display:"inline-flex", alignItems:"center", gap:6, height:37, padding:"0 12px", border:"1px solid var(--border)", borderRadius:"var(--r-sm)", fontSize:"var(--fs-2xs)", fontWeight:600, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:APP_MONO, transition:"all 0.12s" }}><Icon name="search" size={14} /> ⌘K</button>
-            <button onClick={() => setSettingsOpen(o => !o)} aria-label="Settings" className="kn-press kn-hit" style={{ width:37, height:37, borderRadius:"var(--r-sm)", border:`1px solid ${settingsOpen ? "var(--accent)" : "var(--border)"}`, background: settingsOpen ? "hsl(var(--mood-h) 80% 50% / 0.12)" : "transparent", color: settingsOpen ? "var(--accent-hover)" : "var(--text3)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}><Icon name="gear" size={17} /></button>
+            <button onClick={() => setSettingsOpen(o => !o)} aria-label="Settings" className="kn-press kn-hit" style={{ width:37, height:37, flexShrink:0, borderRadius:"var(--r-sm)", border:`1px solid ${settingsOpen ? "var(--accent)" : "var(--border)"}`, background: settingsOpen ? "hsl(var(--mood-h) 80% 50% / 0.12)" : "transparent", color: settingsOpen ? "var(--accent-hover)" : "var(--text3)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}><Icon name="gear" size={17} /></button>
             <button onClick={() => setDark(d => !d)} aria-label={dark ? "Switch to light appearance" : "Switch to dark appearance"} title={dark ? "Light" : "Dark"} className="kn-press kn-hit" style={{ width:37, height:37, borderRadius:"50%", border:"1.5px solid var(--border)", background:"transparent", color:"var(--text3)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"border-color 0.18s", flexShrink:0 }}><Icon name={dark ? "moon" : "sun"} size={16} /></button>
           </div>
         </div>
