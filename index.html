@@ -194,9 +194,9 @@
 
   /* ── Large desktop: keep dense data legible, a touch more air ── */
   @media (min-width: 1440px) {
-    .kn-header  { padding:0 28px !important; }
-    .kn-nav     { padding:0 28px !important; }
-    .kn-footer  { padding:0 28px !important; }
+    .kn-header  { padding:0 44px !important; }
+    .kn-nav     { padding:0 44px !important; }
+    .kn-footer  { padding:0 44px !important; }
     .kn-metrics { gap:34px !important; }
   }
 
@@ -495,10 +495,10 @@ function projectName(id) {
 function urgencyOf(t) { return isOverdue(t) ? "overdue" : isDueSoon(t) ? "soon" : "normal"; }
 function fmtMoneyShort(n) {
   n = Number(n) || 0;
-  if (Math.abs(n) >= 1000) { const k = n/1000; return "£" + (k % 1 === 0 ? k : k.toFixed(1)) + "k"; }
-  return "£" + n.toLocaleString();
+  if (Math.abs(n) >= 1000) { const k = n/1000; return "$" + (k % 1 === 0 ? k : k.toFixed(1)) + "k"; }
+  return "$" + n.toLocaleString();
 }
-function fmtMoney(n) { return "£" + (Number(n)||0).toLocaleString(); }
+function fmtMoney(n) { return "$" + (Number(n)||0).toLocaleString(); }
 
 /* ── Micro-components ── */
 const StatusBadge = ({ status, onClick }) => {
@@ -672,7 +672,7 @@ const TasksView = ({ tasks, onStatusChange, onDelete, onEdit, filter, search }) 
 
 /* ── Projects view ── */
 const ProjectsView = ({ projects, tasks, onEdit, onDelete, onAddTask }) => (
-  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
+  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 32px" }}>
     {projects.length === 0 && <div style={{ padding:"48px 20px", textAlign:"center", color:"var(--text4)", fontSize:13 }}>No projects yet — use “+ New Project” to create one</div>}
     <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))", gap:16 }}>
       {projects.map((p, i) => {
@@ -726,7 +726,7 @@ const PaymentsView = ({ payments, onToggle, onEdit, onDelete }) => {
   const received = sum(p => statusOf(p) === "received");
   const overdue = sum(p => statusOf(p) === "overdue");
   return (
-    <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
+    <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 32px" }}>
       <div className="kn-pay-tiles" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:22 }}>
         {[
           { label:"Outstanding", value:fmtMoney(outstanding), color:"var(--accent-hover)", bar:"var(--accent)" },
@@ -765,7 +765,7 @@ const PaymentsView = ({ payments, onToggle, onEdit, onDelete }) => {
 
 /* ── Decisions view ── */
 const DecisionsView = ({ decisions, onEdit, onDelete }) => (
-  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
+  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 32px" }}>
     <div style={{ maxWidth:820 }}>
       {decisions.length === 0 && <div style={{ padding:"32px 0", color:"var(--text4)", fontSize:13 }}>No decisions logged yet — use “+ New Decision” to log one</div>}
       {decisions.map((d, i) => {
@@ -909,7 +909,7 @@ const EntityModal = ({ kind, item, projects, onClose, onSave, onDelete }) => {
             <Fragment>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                 <Field label="Client"><input value={f.client} onChange={e => set("client", e.target.value)} placeholder="Client name…" style={inp} autoFocus /></Field>
-                <Field label="Amount (£)"><input type="number" inputMode="decimal" value={f.amount} onChange={e => set("amount", e.target.value)} placeholder="0" style={inp} /></Field>
+                <Field label="Amount ($)"><input type="number" inputMode="decimal" value={f.amount} onChange={e => set("amount", e.target.value)} placeholder="0" style={inp} /></Field>
                 <Field label="Status"><select value={f.status} onChange={e => set("status", e.target.value)} style={sel}><option value="pending">Pending</option><option value="received">Received</option></select></Field>
                 <Field label="Due date"><input type="date" value={f.due} onChange={e => set("due", e.target.value)} style={inp} /></Field>
               </div>
@@ -1089,7 +1089,7 @@ const App = () => {
       <div style={{ height:2, background:"var(--red)", flexShrink:0 }}></div>
 
       {/* HEADER */}
-      <div className="kn-header" style={{ height:62, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
+      <div className="kn-header" style={{ height:62, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 32px", background:"var(--surface)", flexShrink:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:9, flexShrink:0 }}>
           <img src="LOGO.png" alt="Kneura" style={{ height:34, width:34, borderRadius:9, objectFit:"cover", display:"block", boxShadow:"var(--sh-1)" }} />
           <div>
@@ -1121,7 +1121,7 @@ const App = () => {
       </div>
 
       {/* NAV TABS + CONTROLS */}
-      <div className={"kn-nav" + (tab === "tasks" ? "" : " kn-nav-empty")} style={{ height:40, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"stretch", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
+      <div className={"kn-nav" + (tab === "tasks" ? "" : " kn-nav-empty")} style={{ height:40, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"stretch", padding:"0 32px", background:"var(--surface)", flexShrink:0 }}>
         <div className="kn-tabs" style={{ display:"flex", height:"100%" }}>
           {TABS.map(({ key, label, count }) => (
             <button key={key} className="nav-tab" onClick={() => { setTab(key); setFilter("all"); setSearch(""); }} style={{ display:"flex", alignItems:"center", gap:5, padding:"0 15px", fontSize:12.5, fontWeight:tab === key ? 700 : 500, color: tab === key ? "var(--text)" : "var(--text3)", background:"transparent", border:"none", borderBottom: tab === key ? "2px solid var(--accent)" : "2px solid transparent", cursor:"pointer", fontFamily:SANS, letterSpacing:"-0.01em", transition:"color 0.15s", whiteSpace:"nowrap" }}>
@@ -1159,7 +1159,7 @@ const App = () => {
       </div>
 
       {/* FOOTER HINTS */}
-      <div className="kn-footer" style={{ height:30, borderTop:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 20px", background:"var(--surface)", flexShrink:0, justifyContent:"space-between" }}>
+      <div className="kn-footer" style={{ height:30, borderTop:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 32px", background:"var(--surface)", flexShrink:0, justifyContent:"space-between" }}>
         <div className="kn-footer-keys" style={{ display:"flex", gap:14, alignItems:"center" }}>
           <Kbd k="N" label="new" />
           <Kbd k="/" label="search" />
