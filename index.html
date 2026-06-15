@@ -57,55 +57,110 @@
   *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
   :root {
-    --bg:           #f7f8fa;
+    --bg:           #f5f5f7;
     --surface:      #ffffff;
-    --surface2:     #eef0f6;
-    --surface3:     #e0e4ee;
-    --border:       #dde1eb;
-    --border2:      #c8cdd9;
-    --line:         #eeeef5;
-    --text:         #1a1d23;
-    --text2:        #6b7280;
-    --text3:        #9aa3af;
-    --text4:        #bcc4ce;
+    --surface2:     #f0f1f4;
+    --surface3:     #e6e7ec;
+    --border:       #e4e5ea;
+    --border2:      #d3d4da;
+    --line:         #eeeef2;
+    --text:         #1d1d1f;
+    --text2:        #545458;
+    --text3:        #86868b;
+    --text4:        #aeaeb4;
     --accent:       #1c5caa;
-    --accent-hover: #4a8bc8;
-    --red:          #c8281e;
-    --green:        #22c55e;
-    --orange:       #f97316;
+    --accent-hover: #2f7dd1;
+    --red:          #d7322a;
+    --green:        #1faa55;
+    --orange:       #f5821f;
+
+    /* Materials */
+    --glass-bg:     rgba(255,255,255,0.72);
+    --glass:        saturate(180%) blur(20px);
+    --hairline:     rgba(0,0,0,0.08);
+
+    /* Radii (Apple-style soft corners) */
+    --r-xs: 7px;  --r-sm: 10px;  --r-md: 14px;  --r-lg: 18px;  --r-xl: 24px;
+
+    /* Elevation */
+    --sh-1: 0 1px 2px rgba(20,30,50,0.04), 0 1px 3px rgba(20,30,50,0.06);
+    --sh-2: 0 6px 20px rgba(20,30,50,0.08), 0 2px 6px rgba(20,30,50,0.05);
+    --sh-3: 0 24px 70px rgba(15,25,45,0.22), 0 6px 18px rgba(15,25,45,0.12);
+
+    /* Motion */
+    --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
+    --ease-smooth: cubic-bezier(0.22,1,0.36,1);
+
+    /* Font */
+    --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   }
 
   [data-theme="dark"] {
-    --bg:           #07111e;
-    --surface:      #0a1929;
-    --surface2:     #0d2240;
-    --surface3:     #102b52;
-    --border:       #1a3a62;
-    --border2:      #1e4875;
-    --line:         #0f2236;
-    --text:         #f0f2f5;
-    --text2:        #a8b8cc;
-    --text3:        #5a7290;
-    --text4:        #3a5270;
-    --accent:       #1c5caa;
-    --accent-hover: #4a8bc8;
-    --red:          #c8281e;
-    --green:        #22c55e;
-    --orange:       #f97316;
+    --bg:           #050a12;
+    --surface:      #0c1826;
+    --surface2:     #122339;
+    --surface3:     #183052;
+    --border:       #1d3a5e;
+    --border2:      #244a74;
+    --line:         #11233a;
+    --text:         #f3f5f8;
+    --text2:        #aebccf;
+    --text3:        #6a83a0;
+    --text4:        #44597a;
+    --accent:       #2f7dd1;
+    --accent-hover: #5aa2e6;
+    --red:          #ff5b52;
+    --green:        #2ec267;
+    --orange:       #ff9a3d;
+
+    --glass-bg:     rgba(10,21,36,0.66);
+    --glass:        saturate(180%) blur(22px);
+    --hairline:     rgba(255,255,255,0.07);
+
+    --sh-1: 0 1px 2px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.3);
+    --sh-2: 0 8px 26px rgba(0,0,0,0.42), 0 2px 8px rgba(0,0,0,0.3);
+    --sh-3: 0 28px 80px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.45);
   }
 
   html, body { height:100%; overflow:hidden; }
-  body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); }
+  body {
+    font-family:var(--font-sans); background:var(--bg); color:var(--text);
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    text-rendering:optimizeLegibility; -webkit-tap-highlight-color:transparent;
+    overscroll-behavior:none;
+  }
+  button { font-family:var(--font-sans); -webkit-tap-highlight-color:transparent; }
 
   /* Scrollbar */
-  ::-webkit-scrollbar { width:4px; height:4px; }
+  ::-webkit-scrollbar { width:7px; height:7px; }
   ::-webkit-scrollbar-track { background:transparent; }
-  ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+  ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:8px; border:2px solid transparent; background-clip:content-box; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--text4); background-clip:content-box; }
+  * { scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
+
+  /* Selection + focus */
+  ::selection { background:rgba(47,125,209,0.22); }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline:none; }
 
   /* Transitions for theme switch */
   body, .theme-transition * {
-    transition: background-color 0.22s ease, border-color 0.22s ease, color 0.22s ease;
+    transition: background-color 0.3s var(--ease-smooth), border-color 0.3s var(--ease-smooth), color 0.3s var(--ease-smooth);
   }
+
+  /* Frosted-glass chrome */
+  .kn-header, .kn-nav, .kn-footer {
+    background:var(--glass-bg) !important;
+    backdrop-filter:var(--glass); -webkit-backdrop-filter:var(--glass);
+  }
+
+  /* Hover lift for cards / interactive surfaces */
+  .kn-lift { transition: transform 0.22s var(--ease-smooth), box-shadow 0.22s var(--ease-smooth), border-color 0.15s; will-change:transform; }
+  .kn-lift:hover { transform:translateY(-3px); box-shadow:var(--sh-2); }
+  @media (hover:none) { .kn-lift:hover { transform:none; box-shadow:none; } }
+
+  /* Press feedback on touch controls */
+  .kn-press { transition: transform 0.12s var(--ease-smooth); }
+  .kn-press:active { transform:scale(0.94); }
 
   /* Animations */
   @keyframes fadeSlide      { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
@@ -114,10 +169,12 @@
   @keyframes slideDown      { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
   @keyframes pulseOpacity   { 0%,100%{opacity:1} 50%{opacity:0.25} }
   @keyframes countUp        { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spin           { to{transform:rotate(360deg)} }
+  @keyframes breathe        { 0%,100%{opacity:0.55;transform:scale(0.97)} 50%{opacity:1;transform:scale(1)} }
 
   /* Form inputs */
-  input, select, textarea { font-family:'Inter',sans-serif; }
-  input:focus, select:focus { border-color:var(--accent-hover) !important; box-shadow:0 0 0 2px rgba(28,92,170,0.18); }
+  input, select, textarea { font-family:var(--font-sans); }
+  input:focus, select:focus, textarea:focus { border-color:var(--accent-hover) !important; box-shadow:0 0 0 3.5px rgba(47,125,209,0.18); }
   select option { background:var(--surface2); color:var(--text); }
 
   /* Button hover states */
@@ -131,17 +188,34 @@
   .kn-metrics, .kn-nav { scrollbar-width:none; -webkit-overflow-scrolling:touch; }
   .kn-metrics::-webkit-scrollbar, .kn-nav::-webkit-scrollbar { display:none; }
 
+  /* Native-style mobile bottom tab bar + floating action button (phone only) */
+  .kn-bottom-nav { display:none; }
+  .kn-fab        { display:none; }
+
+  /* ── Large desktop: keep dense data legible, a touch more air ── */
+  @media (min-width: 1440px) {
+    .kn-header  { padding:0 28px !important; }
+    .kn-nav     { padding:0 28px !important; }
+    .kn-footer  { padding:0 28px !important; }
+    .kn-metrics { gap:34px !important; }
+  }
+
+  /* ── Small laptop / large tablet landscape ── */
+  @media (max-width: 1120px) {
+    .kn-metrics { gap:22px !important; }
+  }
+
   /* ── Tablet / phone (portrait tablets + all phones) ── */
   @media (max-width: 860px) {
-    .kn-header   { padding:0 12px !important; gap:12px !important; }
+    .kn-header   { padding:0 16px !important; gap:14px !important; }
     .kn-divider  { display:none !important; }
-    .kn-metrics  { gap:18px !important; flex:1; overflow-x:auto; padding:0 2px; }
+    .kn-metrics  { gap:20px !important; flex:1; overflow-x:auto; padding:0 2px; -webkit-overflow-scrolling:touch; }
     .kn-metrics > div { flex-shrink:0; }
     .kn-save-btn { display:none !important; }
-    .kn-nav      { padding:0 12px !important; overflow-x:auto; }
+    .kn-nav      { padding:0 16px !important; overflow-x:auto; }
     .kn-controls { margin-left:10px !important; }
-    .kn-content-pad { padding-left:12px !important; padding-right:12px !important; }
-    .kn-footer   { padding:0 12px !important; }
+    .kn-content-pad { padding-left:16px !important; padding-right:16px !important; }
+    .kn-footer   { padding:0 16px !important; }
     .kn-footer-keys { display:none !important; }
     .kn-col-role, .kn-col-project { display:none !important; }
     .kn-row-meta { display:flex !important; }
@@ -150,12 +224,61 @@
     .kn-pay-tiles > div > div:last-child { font-size:20px !important; }
   }
 
+  /* ── Phone: bottom tab bar, FAB, bigger touch targets, safe areas ── */
+  @media (max-width: 640px) {
+    .kn-header   { height:56px !important; padding:0 16px !important; padding-top:env(safe-area-inset-top) !important; }
+    .kn-newtask  { display:none !important; }              /* replaced by FAB */
+    .kn-tabs     { display:none !important; }              /* replaced by bottom nav */
+    .kn-nav      { height:auto !important; min-height:48px; padding:7px 14px !important; }
+    .kn-nav-empty { display:none !important; }             /* hide empty toolbar on non-task tabs */
+    .kn-footer   { display:none !important; }              /* replaced by bottom nav */
+    .kn-content-pad { padding:14px 16px 22px !important; }
+
+    /* Card-based task list on phones */
+    .kn-tasks-thead { display:none !important; }
+    .kn-tasks-scroll { padding-bottom:84px !important; }
+    .kn-task-card {
+      margin:9px 13px; border:1px solid var(--border); border-radius:18px;
+      overflow:hidden; background:var(--surface); box-shadow:var(--sh-1);
+      animation:fadeSlide 0.3s var(--ease-smooth) both;
+    }
+    .kn-task-card .kn-task-row { height:62px !important; border-bottom:none !important; padding-right:14px; }
+    .kn-col-status { width:auto !important; padding-left:6px; }     /* let task titles breathe */
+    .kn-col-due    { display:none !important; }                     /* due shown in expanded meta */
+    .kn-status-badge { font-size:12px !important; padding:5px 12px !important; }
+
+    /* Controls: segmented control + flexible search fill the row */
+    .kn-controls { width:100%; margin-left:0 !important; gap:9px !important; }
+    .kn-searchwrap { flex:1 !important; }
+    .kn-searchwrap .kn-search { flex:1 !important; width:auto !important; }
+
+    /* Bottom navigation */
+    .kn-bottom-nav {
+      display:flex; flex-shrink:0; align-items:stretch; justify-content:space-around;
+      padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+      border-top:1px solid var(--border);
+      background:var(--glass-bg); backdrop-filter:var(--glass); -webkit-backdrop-filter:var(--glass);
+    }
+    .kn-fab {
+      display:flex; position:fixed; right:18px;
+      bottom:calc(72px + env(safe-area-inset-bottom));
+      z-index:120;
+    }
+    .kn-toast {
+      left:16px; right:16px; bottom:calc(80px + env(safe-area-inset-bottom)) !important;
+      text-align:center;
+    }
+  }
+
   /* ── Narrow phones ── */
-  @media (max-width: 420px) {
-    .kn-metrics  { gap:14px !important; }
-    .kn-newtask  { padding:0 11px !important; font-size:0 !important; }
-    .kn-newtask::before { content:"+ New"; font-size:12.5px; }
-    .kn-search   { width:96px !important; }
+  @media (max-width: 400px) {
+    .kn-metrics  { gap:16px !important; }
+    .kn-bottom-tab-label { font-size:10px !important; }
+  }
+
+  /* Respect reduced-motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
   }
 </style>
 </head>
@@ -344,8 +467,8 @@ initSupabase();
 <script type="text/babel">
 const { useState, useEffect, useReducer, useMemo, Fragment } = React;
 
-const MONO = "'JetBrains Mono','Courier New',monospace";
-const SANS = "'Inter',sans-serif";
+const MONO = "'JetBrains Mono','SF Mono','Courier New',monospace";
+const SANS = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, sans-serif";
 
 const DEFAULT_ROLE_COLORS = { CEO:"#1c5caa", COO:"#4a8bc8", CFO:"#22c55e", CMO:"#a855f7", CIO:"#f59e0b" };
 const FALLBACK_PALETTE = ["#1c5caa","#4a8bc8","#22c55e","#a855f7","#f59e0b","#f97316","#06b6d4","#ec4899"];
@@ -381,8 +504,8 @@ function fmtMoney(n) { return "£" + (Number(n)||0).toLocaleString(); }
 const StatusBadge = ({ status, onClick }) => {
   const s = STATUS[status] || STATUS.pending;
   return (
-    <span onClick={onClick} style={{
-      fontSize:11, fontWeight:600, padding:"3px 8px", borderRadius:3,
+    <span onClick={onClick} className={onClick ? "kn-status-badge kn-press" : "kn-status-badge"} style={{
+      fontSize:11, fontWeight:600, padding:"3px 9px", borderRadius:999,
       border:`1px solid ${s.border}`, background:s.bg, color:s.color,
       cursor:onClick?"pointer":"default", userSelect:"none",
       transition:"opacity 0.12s, transform 0.12s", whiteSpace:"nowrap",
@@ -403,11 +526,26 @@ const Kbd = ({ k, label }) => (
   </span>
 );
 const IconBtn = ({ icon, title, danger, onClick }) => (
-  <button onClick={(e) => { e.stopPropagation(); onClick(); }} title={title} className="btn-ghost" style={{ width:26, height:26, flexShrink:0, borderRadius:4, border:"1px solid var(--border)", background:"transparent", color:danger?"#c8281e":"var(--text3)", cursor:"pointer", fontSize:12, fontFamily:SANS, display:"flex", alignItems:"center", justifyContent:"center", lineHeight:1, transition:"all 0.12s" }}>{icon}</button>
+  <button onClick={(e) => { e.stopPropagation(); onClick(); }} title={title} className="btn-ghost kn-press" style={{ width:28, height:28, flexShrink:0, borderRadius:8, border:"1px solid var(--border)", background:"transparent", color:danger?"var(--red)":"var(--text3)", cursor:"pointer", fontSize:12, fontFamily:SANS, display:"flex", alignItems:"center", justifyContent:"center", lineHeight:1, transition:"all 0.12s" }}>{icon}</button>
 );
 // Module-scoped so input focus is preserved across modal re-renders
 const MLBL = { fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)", display:"block", marginBottom:5 };
 const Field = ({ label, children }) => (<div><label style={MLBL}>{label}</label>{children}</div>);
+
+/* ── SF-style line icons for the mobile bottom tab bar ── */
+const NAV_ICONS = {
+  tasks:     "M4 6.5h11M4 12h11M4 17.5h7 M18 5.5l1.6 1.6L22.5 4 M18 11l1.6 1.6L22.5 9.5",
+  projects:  "M3 7.5a2 2 0 0 1 2-2h3.4a2 2 0 0 1 1.6.8l.9 1.2H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+  payments:  "M3 7.5h18a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z M2.5 11h19 M6 14.5h3",
+  decisions: "M12 4l2.3 4.7 5.2.8-3.75 3.66.9 5.16L12 16.9l-4.65 2.42.9-5.16L4.5 9.5l5.2-.8z",
+};
+const TabIcon = ({ k, active }) => (
+  <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth={active ? 2.1 : 1.8} strokeLinecap="round" strokeLinejoin="round"
+    style={{ transition:"stroke-width 0.15s" }}>
+    <path d={NAV_ICONS[k]} />
+  </svg>
+);
 
 /* ── Task row (expandable) ── */
 const TaskRow = ({ task, onStatusChange, onDelete, onEdit }) => {
@@ -420,8 +558,8 @@ const TaskRow = ({ task, onStatusChange, onDelete, onEdit }) => {
   const cycleStatus = (e) => { e.stopPropagation(); onStatusChange(task.id, nextStatus); };
 
   return (
-    <div>
-      <div onClick={() => setOpen(x => !x)} style={{
+    <div className="kn-task-card">
+      <div onClick={() => setOpen(x => !x)} className="kn-task-row" style={{
         display:"flex", alignItems:"center", height:44, paddingRight:14,
         borderLeft:`5px solid ${s.bar}`,
         background: open ? `linear-gradient(90deg,${s.bar}18 0%,var(--surface) 220px)` : `linear-gradient(90deg,${s.bar}0a 0%,transparent 160px)`,
@@ -430,10 +568,10 @@ const TaskRow = ({ task, onStatusChange, onDelete, onEdit }) => {
         <div onClick={e => { e.stopPropagation(); onStatusChange(task.id, isDone ? "pending" : "done"); }}
           style={{ width:15, height:15, border:`1.5px solid ${isDone ? "#22c55e" : "var(--border2)"}`, borderRadius:3, display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, color:"#22c55e", background: isDone ? "rgba(34,197,94,0.14)" : "transparent", flexShrink:0, margin:"0 11px 0 12px", cursor:"pointer", transition:"all 0.15s" }}>{isDone ? "✓" : ""}</div>
         <div style={{ flex:1, fontSize:13.5, fontWeight:isDone ? 400 : 500, color:isDone ? "var(--text4)" : "var(--text)", textDecoration:isDone ? "line-through" : "none", letterSpacing:"-0.01em", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", paddingRight:14 }}>{task.title}</div>
-        <div style={{ width:116 }}><StatusBadge status={task.status} onClick={cycleStatus} /></div>
+        <div className="kn-col-status" style={{ width:116 }}><StatusBadge status={task.status} onClick={cycleStatus} /></div>
         <div className="kn-col-role" style={{ width:70 }}><RoleDot role={task.role} /></div>
         <div className="kn-col-project" style={{ width:126, fontSize:12.5, color:"var(--text4)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{projectName(task.project)}</div>
-        <div style={{ width:56, fontSize:11.5, color:dueCol, textAlign:"right", fontFamily:MONO, fontWeight:500 }}>{dispDate(task.due)}</div>
+        <div className="kn-col-due" style={{ width:56, fontSize:11.5, color:dueCol, textAlign:"right", fontFamily:MONO, fontWeight:500 }}>{dispDate(task.due)}</div>
         <div style={{ width:22, textAlign:"center", fontSize:10, color:"var(--text4)", transition:"transform 0.2s", transform:open?"rotate(180deg)":"rotate(0deg)", flexShrink:0 }}>▾</div>
       </div>
       {open && (
@@ -493,8 +631,8 @@ const TasksView = ({ tasks, onStatusChange, onDelete, onEdit, filter, search }) 
 
   const HEAD = { fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)" };
   return (
-    <div style={{ flex:1, overflow:"auto", minHeight:0 }}>
-      <div style={{ height:28, display:"flex", alignItems:"center", paddingLeft:5, paddingRight:14, background:"var(--surface2)", borderBottom:"1px solid var(--border)", position:"sticky", top:0, zIndex:10, flexShrink:0 }}>
+    <div className="kn-tasks-scroll" style={{ flex:1, overflow:"auto", minHeight:0 }}>
+      <div className="kn-tasks-thead" style={{ height:28, display:"flex", alignItems:"center", paddingLeft:5, paddingRight:14, background:"var(--surface2)", borderBottom:"1px solid var(--border)", position:"sticky", top:0, zIndex:10, flexShrink:0 }}>
         <div style={{ width:44 }}></div>
         <div style={{ flex:1, ...HEAD }}>Task</div>
         <div style={{ width:116, ...HEAD }}>Status</div>
@@ -534,10 +672,10 @@ const TasksView = ({ tasks, onStatusChange, onDelete, onEdit, filter, search }) 
 
 /* ── Projects view ── */
 const ProjectsView = ({ projects, tasks, onEdit, onDelete, onAddTask }) => (
-  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
+  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
     {projects.length === 0 && <div style={{ padding:"48px 20px", textAlign:"center", color:"var(--text4)", fontSize:13 }}>No projects yet — use “+ New Project” to create one</div>}
-    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:10 }}>
-      {projects.map(p => {
+    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))", gap:16 }}>
+      {projects.map((p, i) => {
         const pt = tasks.filter(t => t.project === p.id);
         const total = pt.length;
         const done = pt.filter(t => t.status === "done").length;
@@ -547,9 +685,9 @@ const ProjectsView = ({ projects, tasks, onEdit, onDelete, onAddTask }) => (
         const due = upcoming ? dispDate(upcoming.due) : "—";
         const barColor = blocked > 0 ? "#f97316" : progress > 70 ? "#22c55e" : "#1c5caa";
         return (
-          <div key={p.id} style={{ background:`linear-gradient(105deg,${barColor}0d 0%,var(--surface) 56%)`, border:"1px solid var(--border)", borderLeft:`5px solid ${barColor}`, borderRadius:6, padding:"14px 16px", cursor:"default", transition:"border-color 0.15s, transform 0.18s" }}>
-            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:5 }}>
-              <div style={{ fontSize:13.5, fontWeight:700, color:"var(--text)", lineHeight:1.35, flex:1, minWidth:0 }}>{p.name}</div>
+          <div key={p.id} className="kn-lift" style={{ background:`linear-gradient(105deg,${barColor}0d 0%,var(--surface) 56%)`, border:"1px solid var(--border)", borderLeft:`5px solid ${barColor}`, borderRadius:"var(--r-lg)", padding:"18px 20px", cursor:"default", boxShadow:"var(--sh-1)", animation:`fadeSlide 0.34s var(--ease-smooth) ${Math.min(i,9)*0.035}s both` }}>
+            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:6 }}>
+              <div style={{ fontSize:15, fontWeight:700, color:"var(--text)", lineHeight:1.35, flex:1, minWidth:0, letterSpacing:"-0.01em" }}>{p.name}</div>
               <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
                 {blocked > 0 && (
                   <span style={{ fontSize:10, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"rgba(249,115,22,0.12)", color:"#f97316", border:"1px solid rgba(249,115,22,0.25)", whiteSpace:"nowrap" }}>{blocked} blocked</span>
@@ -588,32 +726,32 @@ const PaymentsView = ({ payments, onToggle, onEdit, onDelete }) => {
   const received = sum(p => statusOf(p) === "received");
   const overdue = sum(p => statusOf(p) === "overdue");
   return (
-    <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
-      <div className="kn-pay-tiles" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:18 }}>
+    <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
+      <div className="kn-pay-tiles" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:22 }}>
         {[
           { label:"Outstanding", value:fmtMoney(outstanding), color:"var(--accent-hover)", bar:"var(--accent)" },
           { label:"Received",    value:fmtMoney(received),    color:"#22c55e",             bar:"#22c55e" },
           { label:"Overdue",     value:fmtMoney(overdue),     color:"#c8281e",             bar:"#c8281e" },
         ].map(tile => (
-          <div key={tile.label} style={{ padding:"12px 16px", background:`linear-gradient(105deg,${tile.bar}10 0%,var(--surface) 60%)`, border:"1px solid var(--border)", borderLeft:`5px solid ${tile.bar}`, borderRadius:5 }}>
-            <div style={{ fontSize:9.5, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)", marginBottom:5 }}>{tile.label}</div>
-            <div style={{ fontSize:24, fontWeight:800, color:tile.color, fontFamily:MONO, letterSpacing:"-0.03em" }}>{tile.value}</div>
+          <div key={tile.label} className="kn-lift" style={{ padding:"15px 18px", background:`linear-gradient(105deg,${tile.bar}10 0%,var(--surface) 60%)`, border:"1px solid var(--border)", borderLeft:`5px solid ${tile.bar}`, borderRadius:"var(--r-md)", boxShadow:"var(--sh-1)" }}>
+            <div style={{ fontSize:9.5, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text4)", marginBottom:7 }}>{tile.label}</div>
+            <div style={{ fontSize:28, fontWeight:800, color:tile.color, fontFamily:MONO, letterSpacing:"-0.03em" }}>{tile.value}</div>
           </div>
         ))}
       </div>
       {payments.length === 0 && <div style={{ padding:"32px 20px", textAlign:"center", color:"var(--text4)", fontSize:13 }}>No payments recorded</div>}
-      {payments.map(p => {
+      {payments.map((p, i) => {
         const st = statusOf(p);
         const sc = st === "received" ? "#22c55e" : st === "overdue" ? "#c8281e" : "#f59e0b";
         return (
-          <div key={p.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 16px", marginBottom:5, background:`linear-gradient(90deg,${sc}09 0%,var(--surface) 180px)`, border:"1px solid var(--border)", borderLeft:`5px solid ${sc}`, borderRadius:4 }}>
+          <div key={p.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 17px", marginBottom:8, background:`linear-gradient(90deg,${sc}09 0%,var(--surface) 180px)`, border:"1px solid var(--border)", borderLeft:`5px solid ${sc}`, borderRadius:"var(--r-md)", boxShadow:"var(--sh-1)", animation:`fadeSlide 0.3s var(--ease-smooth) ${Math.min(i,9)*0.03}s both` }}>
             <div style={{ flex:1, minWidth:0 }}>
               <div style={{ fontSize:13.5, fontWeight:600, color:"var(--text)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.client || "—"}</div>
               {p.notes ? <div style={{ fontSize:11, color:"var(--text4)", fontFamily:MONO, marginTop:2 }}>{p.notes}</div> : null}
             </div>
             <div style={{ fontSize:16, fontWeight:800, color:"var(--text)", fontFamily:MONO, flexShrink:0 }}>{fmtMoney(p.amount)}</div>
             <div style={{ fontSize:11.5, color:"var(--text4)", fontFamily:MONO, width:52, textAlign:"right", flexShrink:0 }}>{dispDate(p.due)}</div>
-            <button onClick={() => onToggle(p.id)} style={{ height:28, padding:"0 12px", border:"none", borderRadius:3, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:SANS, flexShrink:0, background: st === "received" ? "rgba(34,197,94,0.12)" : st === "overdue" ? "rgba(200,40,30,0.1)" : "rgba(245,158,11,0.12)", color: sc }}>
+            <button onClick={() => onToggle(p.id)} className="kn-press" style={{ height:30, padding:"0 13px", border:"none", borderRadius:999, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:SANS, flexShrink:0, background: st === "received" ? "rgba(34,197,94,0.12)" : st === "overdue" ? "rgba(200,40,30,0.1)" : "rgba(245,158,11,0.12)", color: sc }}>
               {st === "received" ? "✓ Received" : st === "overdue" ? "Overdue" : "Pending"}
             </button>
             <IconBtn icon="✎" title="Edit payment" onClick={() => onEdit(p)} />
@@ -627,7 +765,7 @@ const PaymentsView = ({ payments, onToggle, onEdit, onDelete }) => {
 
 /* ── Decisions view ── */
 const DecisionsView = ({ decisions, onEdit, onDelete }) => (
-  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
+  <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"24px 26px" }}>
     <div style={{ maxWidth:820 }}>
       {decisions.length === 0 && <div style={{ padding:"32px 0", color:"var(--text4)", fontSize:13 }}>No decisions logged yet — use “+ New Decision” to log one</div>}
       {decisions.map((d, i) => {
@@ -643,7 +781,7 @@ const DecisionsView = ({ decisions, onEdit, onDelete }) => (
             </div>
             <div style={{ width:2, background:"var(--border)", borderRadius:2, flexShrink:0, alignSelf:"stretch", minHeight:20 }}></div>
             <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontSize:13.5, color:"var(--text)", lineHeight:1.7 }}>{d.note || d.text || ""}</div>
+              <div style={{ fontSize:14.5, color:"var(--text)", lineHeight:1.7, letterSpacing:"-0.005em" }}>{d.note || d.text || ""}</div>
             </div>
             <div style={{ display:"flex", gap:6, flexShrink:0, alignItems:"flex-start", paddingTop:1 }}>
               <IconBtn icon="✎" title="Edit decision" onClick={() => onEdit(d)} />
@@ -663,8 +801,8 @@ const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onToast }) => {
   const ghLbl = { fontSize:9.5, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)", marginBottom:4 };
   return (
     <Fragment>
-      <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:199, background:"rgba(0,0,0,0.35)", backdropFilter:"blur(4px)" }} />
-      <div style={{ position:"fixed", top:0, right:0, bottom:0, width:300, background:"var(--surface)", borderLeft:"1px solid var(--border2)", display:"flex", flexDirection:"column", zIndex:200, boxShadow:"-20px 0 60px rgba(0,0,0,0.4)", animation:"slideInRight 0.28s cubic-bezier(0.22,1,0.36,1) both" }}>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:199, background:"rgba(8,14,24,0.4)", backdropFilter:"blur(5px)", WebkitBackdropFilter:"blur(5px)", animation:"fadeSlide 0.2s ease both" }} />
+      <div style={{ position:"fixed", top:0, right:0, bottom:0, width:"min(340px, 88vw)", paddingTop:"env(safe-area-inset-top)", background:"var(--glass-bg)", backdropFilter:"var(--glass)", WebkitBackdropFilter:"var(--glass)", borderLeft:"1px solid var(--border2)", display:"flex", flexDirection:"column", zIndex:200, boxShadow:"var(--sh-3)", animation:"slideInRight 0.34s var(--ease-smooth) both" }}>
         <div style={{ height:52, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 18px", borderBottom:"1px solid var(--border)", flexShrink:0 }}>
           <span style={{ fontSize:13, fontWeight:700, color:"var(--text)", letterSpacing:"0.02em" }}>Settings</span>
           <button onClick={onClose} style={{ width:28, height:28, borderRadius:4, border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"var(--text3)", fontSize:13, background:"transparent", fontFamily:SANS }}>✕</button>
@@ -726,7 +864,7 @@ const EntityModal = ({ kind, item, projects, onClose, onSave, onDelete }) => {
   const set = (k, v) => setF(x => ({ ...x, [k]:v }));
   const isEdit = !!(item && item.id);
 
-  const inp = { width:"100%", background:"var(--surface2)", border:"1px solid var(--border)", borderRadius:4, color:"var(--text)", fontFamily:SANS, fontSize:13, padding:"9px 12px", outline:"none", boxSizing:"border-box", transition:"border-color 0.15s" };
+  const inp = { width:"100%", background:"var(--surface2)", border:"1px solid var(--border)", borderRadius:"var(--r-sm)", color:"var(--text)", fontFamily:SANS, fontSize:16, padding:"11px 13px", outline:"none", boxSizing:"border-box", transition:"border-color 0.15s, box-shadow 0.15s" };
   const sel = { ...inp, appearance:"none", cursor:"pointer" };
   const area = { ...inp, minHeight:64, resize:"vertical", lineHeight:1.5 };
 
@@ -737,8 +875,8 @@ const EntityModal = ({ kind, item, projects, onClose, onSave, onDelete }) => {
                          String(f.note).trim();
 
   return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.65)", backdropFilter:"blur(10px)", zIndex:300, display:"flex", alignItems:"center", justifyContent:"center", padding:20, overflow:"auto" }}>
-      <div style={{ background:"var(--surface)", border:"1px solid var(--border2)", borderTop:"2px solid var(--accent)", borderRadius:10, padding:24, width:"100%", maxWidth:460, boxShadow:"0 24px 80px rgba(0,0,0,0.55)", animation:"scaleIn 0.24s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+    <div style={{ position:"fixed", inset:0, background:"rgba(8,14,24,0.55)", backdropFilter:"saturate(160%) blur(14px)", WebkitBackdropFilter:"saturate(160%) blur(14px)", zIndex:300, display:"flex", alignItems:"center", justifyContent:"center", padding:"20px 20px calc(20px + env(safe-area-inset-bottom))", overflow:"auto", animation:"fadeSlide 0.2s ease both" }}>
+      <div style={{ background:"var(--surface)", border:"1px solid var(--border2)", borderTop:"3px solid var(--accent)", borderRadius:"var(--r-xl)", padding:26, width:"100%", maxWidth:472, boxShadow:"var(--sh-3)", animation:"scaleIn 0.3s var(--ease-spring) both" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
           <span style={{ fontSize:16, fontWeight:800, color:"var(--text)", letterSpacing:"-0.02em" }}>{isEdit ? "Edit " : "New "}{ENTITY_LABEL[kind]}</span>
           <button onClick={onClose} style={{ background:"none", border:"none", color:"var(--text3)", cursor:"pointer", fontSize:18, fontFamily:SANS, lineHeight:1 }}>✕</button>
@@ -787,10 +925,10 @@ const EntityModal = ({ kind, item, projects, onClose, onSave, onDelete }) => {
           )}
 
           <div style={{ display:"flex", gap:8, alignItems:"center", marginTop:4 }}>
-            {isEdit && <button onClick={() => onDelete(item.id)} style={{ height:36, padding:"0 14px", border:"1px solid rgba(200,40,30,0.25)", borderRadius:5, fontSize:13, fontWeight:600, color:"#c8281e", background:"rgba(200,40,30,0.07)", cursor:"pointer", fontFamily:SANS }}>Delete</button>}
+            {isEdit && <button onClick={() => onDelete(item.id)} className="kn-press" style={{ height:40, padding:"0 16px", border:"1px solid rgba(215,50,42,0.28)", borderRadius:"var(--r-sm)", fontSize:13.5, fontWeight:600, color:"var(--red)", background:"rgba(215,50,42,0.08)", cursor:"pointer", fontFamily:SANS }}>Delete</button>}
             <div style={{ flex:1 }} />
-            <button onClick={onClose} style={{ height:36, padding:"0 16px", border:"1px solid var(--border)", borderRadius:5, fontSize:13, fontWeight:600, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:SANS }}>Cancel</button>
-            <button onClick={() => { if (valid) onSave({ ...f, id:item && item.id }); }} style={{ height:36, padding:"0 18px", border:"none", borderRadius:5, fontSize:13, fontWeight:700, color:"#fff", background:"var(--accent)", cursor:valid?"pointer":"not-allowed", fontFamily:SANS, opacity:valid ? 1 : 0.4 }}>{isEdit ? "Save" : "Add"}</button>
+            <button onClick={onClose} className="kn-press" style={{ height:40, padding:"0 18px", border:"1px solid var(--border)", borderRadius:"var(--r-sm)", fontSize:13.5, fontWeight:600, color:"var(--text2)", background:"transparent", cursor:"pointer", fontFamily:SANS }}>Cancel</button>
+            <button onClick={() => { if (valid) onSave({ ...f, id:item && item.id }); }} className="kn-press" style={{ height:40, padding:"0 22px", border:"none", borderRadius:"var(--r-sm)", fontSize:13.5, fontWeight:700, color:"#fff", background:"var(--accent)", boxShadow:valid?"0 4px 14px rgba(28,92,170,0.35)":"none", cursor:valid?"pointer":"not-allowed", fontFamily:SANS, opacity:valid ? 1 : 0.4, transition:"opacity 0.15s, box-shadow 0.15s" }}>{isEdit ? "Save" : "Add"}</button>
           </div>
         </div>
       </div>
@@ -938,7 +1076,12 @@ const App = () => {
   ];
 
   if (!ready) {
-    return <div style={{ height:"100dvh", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--text4)", fontSize:13, fontFamily:MONO }}>Loading…</div>;
+    return (
+      <div style={{ height:"100dvh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:18, background:"var(--bg)" }}>
+        <img src="LOGO.png" alt="Kneura" style={{ height:52, width:52, borderRadius:12, objectFit:"cover", boxShadow:"var(--sh-2)", animation:"breathe 1.8s ease-in-out infinite" }} />
+        <div style={{ width:22, height:22, borderRadius:"50%", border:"2.5px solid var(--border2)", borderTopColor:"var(--accent)", animation:"spin 0.7s linear infinite" }}></div>
+      </div>
+    );
   }
 
   return (
@@ -948,7 +1091,7 @@ const App = () => {
       {/* HEADER */}
       <div className="kn-header" style={{ height:62, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:9, flexShrink:0 }}>
-          <img src="LOGO.png" alt="Kneura" style={{ height:34, width:34, borderRadius:5, objectFit:"cover", display:"block" }} />
+          <img src="LOGO.png" alt="Kneura" style={{ height:34, width:34, borderRadius:9, objectFit:"cover", display:"block", boxShadow:"var(--sh-1)" }} />
           <div>
             <div style={{ fontWeight:800, fontSize:14.5, letterSpacing:"0.02em", lineHeight:1, display:"flex", alignItems:"baseline", gap:1 }}>
               <span style={{ color:"var(--text)" }}>Kneura</span>
@@ -963,23 +1106,23 @@ const App = () => {
           {metrics.map(m => (
             <div key={m.l} style={{ display:"flex", flexDirection:"column", gap:1, cursor:"default" }}>
               <div style={{ fontSize:9, fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", color:"var(--text4)" }}>{m.l}</div>
-              <div style={{ fontSize:22, fontWeight:800, color:m.c, lineHeight:1, letterSpacing:"-0.04em", fontFamily:MONO }}>{m.v}</div>
+              <div style={{ fontSize:23.5, fontWeight:800, color:m.c, lineHeight:1, letterSpacing:"-0.04em", fontFamily:MONO }}>{m.v}</div>
             </div>
           ))}
         </div>
         <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
-          <button className="kn-newtask" onClick={startNew} style={{ height:34, padding:"0 15px", border:"none", borderRadius:5, fontSize:12.5, fontWeight:700, background:"var(--accent)", color:"#fff", cursor:"pointer", fontFamily:SANS, letterSpacing:"0.01em", transition:"background 0.15s", whiteSpace:"nowrap" }}>+ New {ENTITY_LABEL[tab.slice(0,-1)]}</button>
-          <button className="kn-save-btn" onClick={() => { manualSave(); showToast("Saved"); }} style={{ height:34, padding:"0 12px", border:"1px solid var(--border)", borderRadius:5, fontSize:12, fontWeight:500, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:MONO, transition:"all 0.12s" }}>⌘S</button>
-          <button onClick={() => setSettingsOpen(o => !o)} style={{ width:34, height:34, borderRadius:5, border:`1px solid ${settingsOpen ? "var(--accent)" : "var(--border)"}`, background: settingsOpen ? "rgba(28,92,170,0.12)" : "transparent", color: settingsOpen ? "var(--accent-hover)" : "var(--text3)", cursor:"pointer", fontSize:15, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:SANS, transition:"all 0.15s" }}>⚙</button>
-          <button onClick={() => setDark(d => !d)} title={dark ? "Switch to light" : "Switch to dark"} style={{ width:30, height:30, borderRadius:"50%", border:"1.5px solid var(--border)", background:"transparent", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"border-color 0.18s", flexShrink:0 }}>
+          <button className="kn-newtask kn-press" onClick={startNew} style={{ height:36, padding:"0 17px", border:"none", borderRadius:"var(--r-sm)", fontSize:12.5, fontWeight:700, background:"var(--accent)", color:"#fff", cursor:"pointer", fontFamily:SANS, letterSpacing:"0.01em", boxShadow:"0 3px 12px rgba(28,92,170,0.32)", transition:"background 0.15s, box-shadow 0.15s", whiteSpace:"nowrap" }}>+ New {ENTITY_LABEL[tab.slice(0,-1)]}</button>
+          <button className="kn-save-btn kn-press" onClick={() => { manualSave(); showToast("Saved"); }} style={{ height:36, padding:"0 13px", border:"1px solid var(--border)", borderRadius:"var(--r-sm)", fontSize:12, fontWeight:500, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:MONO, transition:"all 0.12s" }}>⌘S</button>
+          <button onClick={() => setSettingsOpen(o => !o)} className="kn-press" style={{ width:36, height:36, borderRadius:"var(--r-sm)", border:`1px solid ${settingsOpen ? "var(--accent)" : "var(--border)"}`, background: settingsOpen ? "rgba(28,92,170,0.12)" : "transparent", color: settingsOpen ? "var(--accent-hover)" : "var(--text3)", cursor:"pointer", fontSize:15, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:SANS, transition:"all 0.15s" }}>⚙</button>
+          <button onClick={() => setDark(d => !d)} title={dark ? "Switch to light" : "Switch to dark"} className="kn-press" style={{ width:32, height:32, borderRadius:"50%", border:"1.5px solid var(--border)", background:"transparent", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"border-color 0.18s", flexShrink:0 }}>
             <div style={{ width:10, height:10, borderRadius:"50%", background: dark ? "var(--text)" : "transparent", border: dark ? "none" : "2px solid var(--text)", transition:"all 0.18s" }}></div>
           </button>
         </div>
       </div>
 
       {/* NAV TABS + CONTROLS */}
-      <div className="kn-nav" style={{ height:40, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"stretch", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
-        <div style={{ display:"flex", height:"100%" }}>
+      <div className={"kn-nav" + (tab === "tasks" ? "" : " kn-nav-empty")} style={{ height:40, borderBottom:"1px solid var(--border)", display:"flex", alignItems:"stretch", padding:"0 20px", background:"var(--surface)", flexShrink:0 }}>
+        <div className="kn-tabs" style={{ display:"flex", height:"100%" }}>
           {TABS.map(({ key, label, count }) => (
             <button key={key} className="nav-tab" onClick={() => { setTab(key); setFilter("all"); setSearch(""); }} style={{ display:"flex", alignItems:"center", gap:5, padding:"0 15px", fontSize:12.5, fontWeight:tab === key ? 700 : 500, color: tab === key ? "var(--text)" : "var(--text3)", background:"transparent", border:"none", borderBottom: tab === key ? "2px solid var(--accent)" : "2px solid transparent", cursor:"pointer", fontFamily:SANS, letterSpacing:"-0.01em", transition:"color 0.15s", whiteSpace:"nowrap" }}>
               {label}
@@ -990,13 +1133,18 @@ const App = () => {
           ))}
         </div>
         {tab === "tasks" && (
-          <div className="kn-controls" style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:5, animation:"slideDown 0.18s ease both" }}>
-            {[["all","All"],["overdue","Overdue"],["blocked","Blocked"]].map(([val,lbl]) => (
-              <button key={val} onClick={() => setFilter(val)} style={{ height:26, padding:"0 10px", cursor:"pointer", border: filter === val ? "1.5px solid var(--text)" : "1px solid var(--border)", borderRadius:3, fontSize:11.5, fontWeight:filter === val ? 700 : 500, color: filter === val ? "var(--text)" : "var(--text3)", background: filter === val ? "var(--surface2)" : "transparent", fontFamily:SANS, transition:"all 0.12s" }}>{lbl}</button>
-            ))}
-            <div style={{ display:"flex", alignItems:"center", height:26, border:"1px solid var(--border)", borderRadius:3, overflow:"hidden", background:"var(--surface2)", marginLeft:2 }}>
-              <span style={{ padding:"0 7px", fontSize:11, color:"var(--text4)", flexShrink:0, fontFamily:MONO }}>/</span>
-              <input id="kn-search" className="kn-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" style={{ border:"none", background:"transparent", color:"var(--text)", fontFamily:SANS, fontSize:12.5, padding:"0 8px 0 0", outline:"none", width:140, height:"100%" }} />
+          <div className="kn-controls" style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:8, animation:"slideDown 0.18s ease both" }}>
+            <div className="kn-segment" style={{ display:"flex", alignItems:"center", gap:2, flexShrink:0, background:"var(--surface2)", border:"1px solid var(--border)", borderRadius:999, padding:3, height:32 }}>
+              {[["all","All"],["overdue","Overdue"],["blocked","Blocked"]].map(([val,lbl]) => {
+                const on = filter === val;
+                return (
+                  <button key={val} onClick={() => setFilter(val)} className="kn-press" style={{ height:"100%", padding:"0 14px", cursor:"pointer", border:"none", borderRadius:999, fontSize:12, fontWeight:on ? 700 : 500, color: on ? "var(--text)" : "var(--text3)", background: on ? "var(--surface)" : "transparent", boxShadow: on ? "var(--sh-1)" : "none", fontFamily:SANS, transition:"all 0.2s var(--ease-smooth)", whiteSpace:"nowrap" }}>{lbl}</button>
+                );
+              })}
+            </div>
+            <div className="kn-searchwrap" style={{ display:"flex", alignItems:"center", height:32, border:"1px solid var(--border)", borderRadius:999, overflow:"hidden", background:"var(--surface2)", paddingLeft:11 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text4)" strokeWidth="2.4" strokeLinecap="round" style={{ flexShrink:0 }}><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input id="kn-search" className="kn-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search" style={{ border:"none", background:"transparent", color:"var(--text)", fontFamily:SANS, fontSize:16, padding:"0 13px 0 8px", outline:"none", width:150, height:"100%" }} />
             </div>
           </div>
         )}
@@ -1020,11 +1168,34 @@ const App = () => {
         <span style={{ fontSize:11, color:"var(--text4)", fontFamily:MONO }}>{_lastSavedAt ? "Saved · " + new Date(_lastSavedAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) : "Auto-sync on"}</span>
       </div>
 
+      {/* MOBILE BOTTOM TAB BAR (phone only) */}
+      <div className="kn-bottom-nav">
+        {TABS.map(({ key, label, count }) => {
+          const on = tab === key;
+          return (
+            <button key={key} onClick={() => { setTab(key); setFilter("all"); setSearch(""); }} className="kn-press"
+              style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:3, padding:"5px 0", border:"none", background:"transparent", cursor:"pointer", color: on ? "var(--accent-hover)" : "var(--text3)", position:"relative", fontFamily:SANS }}>
+              <div style={{ position:"relative" }}>
+                <TabIcon k={key} active={on} />
+                {count !== "" && count > 0 && (
+                  <span style={{ position:"absolute", top:-5, right:-9, minWidth:15, height:15, padding:"0 4px", borderRadius:999, background:on?"var(--accent)":"var(--text4)", color:"#fff", fontSize:9, fontWeight:700, fontFamily:MONO, display:"flex", alignItems:"center", justifyContent:"center", lineHeight:1 }}>{count}</span>
+                )}
+              </div>
+              <span className="kn-bottom-tab-label" style={{ fontSize:11, fontWeight: on ? 700 : 500, letterSpacing:"-0.01em" }}>{label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* FLOATING ACTION BUTTON (phone only) */}
+      <button onClick={startNew} aria-label="New" className="kn-fab kn-press"
+        style={{ width:56, height:56, borderRadius:"50%", border:"none", background:"var(--accent)", color:"#fff", alignItems:"center", justifyContent:"center", fontSize:28, fontWeight:300, lineHeight:1, cursor:"pointer", boxShadow:"0 8px 24px rgba(28,92,170,0.5), 0 2px 8px rgba(0,0,0,0.3)", fontFamily:SANS }}>+</button>
+
       {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} onAddRole={onAddRole} onRenameRole={onRenameRole} onToast={showToast} />}
       {modal && <EntityModal kind={modal.kind} item={modal.item} projects={S.projects||[]} onClose={() => setModal(null)} onSave={f => { saveEntity(modal.kind, f); setModal(null); }} onDelete={id => { deleteEntity(modal.kind, id); setModal(null); }} />}
 
       {toastMsg && (
-        <div style={{ position:"fixed", bottom:44, right:20, background:"var(--surface2)", border:"1px solid var(--border2)", borderRadius:7, padding:"9px 16px", fontSize:13, fontWeight:600, color:"var(--text)", zIndex:400, boxShadow:"0 8px 30px rgba(0,0,0,0.3)", animation:"fadeSlide 0.28s cubic-bezier(0.34,1.56,0.64,1) both", pointerEvents:"none" }}>{toastMsg}</div>
+        <div className="kn-toast" style={{ position:"fixed", bottom:44, right:20, background:"var(--glass-bg)", backdropFilter:"var(--glass)", WebkitBackdropFilter:"var(--glass)", border:"1px solid var(--border2)", borderRadius:999, padding:"10px 18px", fontSize:13, fontWeight:600, color:"var(--text)", zIndex:400, boxShadow:"var(--sh-2)", animation:"fadeSlide 0.28s var(--ease-spring) both", pointerEvents:"none" }}>{toastMsg}</div>
       )}
     </div>
   );
