@@ -276,6 +276,25 @@
     .kn-bottom-tab-label { font-size:10px !important; }
   }
 
+  /* ── Ultra-wide desktop: center content, cap line length so it doesn't sprawl ── */
+  @media (min-width: 1700px) {
+    .kn-header, .kn-nav, .kn-footer, .kn-content-pad, .kn-tasks-scroll {
+      padding-left:  calc((100vw - 1600px) / 2) !important;
+      padding-right: calc((100vw - 1600px) / 2) !important;
+    }
+    .kn-content-pad { padding-top:28px !important; padding-bottom:28px !important; }
+  }
+
+  /* ── Landscape phones / short viewports: slim the chrome so content gets the room ── */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .kn-header  { height:48px !important; padding-top:env(safe-area-inset-top) !important; }
+    .kn-nav     { min-height:38px !important; height:38px !important; }
+    .kn-footer  { display:none !important; }
+    .kn-bottom-nav { padding:3px 6px calc(3px + env(safe-area-inset-bottom)) !important; }
+    .kn-fab     { width:48px !important; height:48px !important; bottom:calc(60px + env(safe-area-inset-bottom)) !important; }
+    .kn-tasks-scroll { padding-bottom:68px !important; }
+  }
+
   /* Respect reduced-motion preferences */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
