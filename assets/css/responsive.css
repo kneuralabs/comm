@@ -22,8 +22,10 @@
 @media (max-width: 860px) {
   .kn-header   { padding: 0 16px !important; gap: 14px !important; }
   .kn-divider  { display: none !important; }
-  .kn-metrics  { gap: 20px !important; flex: 1; overflow-x: auto; padding: 0 2px; -webkit-overflow-scrolling: touch; }
-  .kn-metrics > div { flex-shrink: 0; }
+  .kn-metrics  { gap: 20px !important; flex: 1; min-width: 0; overflow-x: auto; padding: 0 2px; -webkit-overflow-scrolling: touch;
+                 scroll-snap-type: x proximity; scrollbar-width: none; -ms-overflow-style: none; }
+  .kn-metrics::-webkit-scrollbar { display: none; }
+  .kn-metrics > div { flex-shrink: 0; scroll-snap-align: start; }
   .kn-save-btn { display: none !important; }
   .kn-nav      { padding: 0 16px !important; overflow-x: auto; }
   .kn-controls { margin-left: 10px !important; }
@@ -39,7 +41,10 @@
 
 /* ── Phone: bottom tab bar, FAB, big targets, safe areas ── */
 @media (max-width: 640px) {
-  .kn-header   { height: 56px !important; padding: 0 16px !important; padding-top: env(safe-area-inset-top) !important; }
+  .kn-header   { height: 56px !important; padding: 0 14px !important; padding-top: env(safe-area-inset-top) !important; gap: 12px !important; }
+  /* Reclaim horizontal room for the metrics strip on phones */
+  .kn-subtitle { display: none !important; }
+  .kn-metrics  { gap: 18px !important; margin-right: 4px; }
   .kn-newtask  { display: none !important; }
   .kn-tabs     { display: none !important; }
   .kn-nav      { height: auto !important; min-height: 48px; padding: 7px 14px !important; }
