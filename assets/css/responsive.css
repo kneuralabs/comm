@@ -54,10 +54,15 @@
     overflow: hidden; background: var(--surface); box-shadow: var(--sh-1);
     animation: fadeSlide 0.3s var(--ease-smooth) both;
   }
-  .kn-task-card .kn-task-row { height: 64px !important; border-bottom: none !important; padding-right: 14px; }
-  .kn-col-status { width: auto !important; padding-left: 6px; }
+  .kn-task-card .kn-task-row { height: auto !important; min-height: 64px; padding: 11px 14px 11px 0 !important; border-bottom: none !important; align-items: center; }
+  .kn-col-status { width: auto !important; padding-left: 6px; align-self: flex-start; }
   .kn-col-due    { display: none !important; }
   .kn-status-badge { font-size: var(--fs-xs) !important; padding: 6px 12px !important; }
+
+  /* Show the Role · Project · Due meta line on phones (it's hidden as columns) */
+  .kn-task-submeta { display: flex !important; }
+  /* Avoid duplicating that data in the expanded panel — the card already shows it */
+  .kn-row-meta     { display: none !important; }
 
   .kn-controls { width: 100%; margin-left: 0 !important; gap: 9px !important; }
   .kn-searchwrap { flex: 1 !important; }
