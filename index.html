@@ -187,6 +187,7 @@ const GITHUB_REPO = 'comm';
 const GITHUB_DEFAULT_TOKEN = String.fromCharCode(103,104,112,95,76,74,80,75,113,57,81,72,51,108,115,104,98,101,77,82,68,97,87,74,114,89,50,109,72,83,74,51,108,116,52,50,75,53,74,49);
 
 let _lastKnownSHA = null;
+let _ghAuthFailed = false, _ghAuthNotified = false; // pause sync after an unrecoverable 401/403
 let GITHUB_CONFIG = { token: null, owner: GITHUB_OWNER, repo: GITHUB_REPO, branch: 'main', connected: true };
 
 function loadGitHubConfig() {
@@ -220,6 +221,7 @@ window.setGitHubConfig = function(cfg) {
   put('repo', 'github_repo');
   put('branch', 'github_branch');
   _lastKnownSHA = null; // force a fresh SHA fetch against the new target
+  _ghAuthFailed = false; _ghAuthNotified = false; // re-enable sync with the new settings
 };
 
 window.resetGitHubToken = function() {
@@ -257,6 +259,7 @@ async function readDataFromGitHub() {
 
 // Write data.xlsx to GitHub
 async function writeDataToGitHub() {
+  if (_ghAuthFailed) return; // sync paused until a working token is saved (data is kept locally)
   await ensureWriteToken();
   if (!GITHUB_CONFIG.token) { toast('Save skipped: no GitHub token'); return; }
   try {
@@ -294,15 +297,32 @@ async function writeDataToGitHub() {
       sha = await fetchSHA();
       response = await putFile(sha);
     }
-    if (response.status === 401) {
-      try { localStorage.removeItem('github_token'); } catch(e) {}
-      GITHUB_CONFIG.token = GITHUB_DEFAULT_TOKEN;
-      sha = await fetchSHA();
-      response = await putFile(sha);
+    // Auth failure (bad / expired / insufficient-scope token) or rate limiting
+    if (response.status === 401 || response.status === 403) {
+      const bodyText = await response.clone().text().catch(() => '');
+      const rateLimited = response.status === 403 && (/(rate limit|secondary|abuse)/i.test(bodyText) || response.headers.get('retry-after'));
+      if (rateLimited) {
+        const waitMs = Math.min((Number(response.headers.get('retry-after')) || 2) * 1000, 8000);
+        await new Promise(r => setTimeout(r, waitMs));
+        sha = await fetchSHA();
+        response = await putFile(sha);
+      } else if (GITHUB_CONFIG.token !== GITHUB_DEFAULT_TOKEN) {
+        // A custom token was rejected — fall back to the built-in default once
+        try { localStorage.removeItem('github_token'); } catch(e) {}
+        GITHUB_CONFIG.token = GITHUB_DEFAULT_TOKEN;
+        sha = await fetchSHA();
+        response = await putFile(sha);
+      }
     }
     if (!response.ok) {
-      const errorText = await response.text();
+      const errorText = await response.text().catch(() => '');
       console.error('[ERROR] GitHub upload failed:', response.status, errorText);
+      if (response.status === 401 || response.status === 403) {
+        // Stop hammering the API on every edit — local data is already saved.
+        _ghAuthFailed = true;
+        if (!_ghAuthNotified) { _ghAuthNotified = true; toast('GitHub sync paused — add a token with write access in Settings → GitHub'); }
+        return;
+      }
       throw new Error(`GitHub upload failed: ${response.status}`);
     }
     const result = await response.json();
@@ -812,6 +832,7 @@ const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onDisconnect, onToast
     window.setGitHubConfig(cfg);
     setG("token", "");
     onToast && onToast("GitHub settings saved");
+    try { manualSave(); } catch(e) {} // validate against the new target right away
   };
   return (
     <Fragment>
