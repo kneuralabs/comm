@@ -420,7 +420,7 @@ async function _syncFromCloud() {
   } catch(e) {}
 }
 
-// Load: cloud first (source of truth), falling back to localStorage / IndexedDB, then seed demo data
+// Load: cloud first (source of truth), falling back to localStorage / IndexedDB (starts empty if none)
 async function load() {
   _idb = await _openIDB();
   let loaded = false;
@@ -442,20 +442,6 @@ async function load() {
     }
   }
 
-  if (!S.projects.length) {
-    S.projects = [ { id: uid(), name: 'Product Launch', role: 'CEO', desc: '' }, { id: uid(), name: 'Q3 Financials', role: 'CFO', desc: '' } ];
-  }
-  if (!S.tasks.length) {
-    const p0 = S.projects[0].id, p1 = S.projects[1].id;
-    const t = new Date(), tom = new Date(t), yes = new Date(t);
-    tom.setDate(tom.getDate()+1); yes.setDate(yes.getDate()-1);
-    S.tasks = [
-      { id: uid(), title: 'Finalize product roadmap',   role: 'CEO', project: p0, priority: 'high',   status: 'in-progress', due: fd(tom), nextAction: 'Write Q4 objectives section', notes: '' },
-      { id: uid(), title: 'Review Q3 expense report',   role: 'CFO', project: p1, priority: 'high',   status: 'pending',     due: fd(yes), nextAction: 'Pull receipts from Notion',    notes: '' },
-      { id: uid(), title: 'Set up analytics dashboard', role: 'CIO', project: p0, priority: 'medium', status: 'blocked',     due: fd(tom), nextAction: 'Unblock API access from vendor', notes: 'Waiting on vendor' },
-      { id: uid(), title: 'Launch email campaign',      role: 'CMO', project: p0, priority: 'medium', status: 'pending',     due: '',      nextAction: 'Draft campaign brief',         notes: '' },
-    ];
-  }
 }
 
 initSupabase();
