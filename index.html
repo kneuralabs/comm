@@ -526,9 +526,15 @@ const Kbd = ({ k, label }) => (
     {label}
   </span>
 );
+const IconBtn = ({ icon, title, danger, onClick }) => (
+  <button onClick={(e) => { e.stopPropagation(); onClick(); }} title={title} className="btn-ghost" style={{ width:26, height:26, flexShrink:0, borderRadius:4, border:"1px solid var(--border)", background:"transparent", color:danger?"#c8281e":"var(--text3)", cursor:"pointer", fontSize:12, fontFamily:SANS, display:"flex", alignItems:"center", justifyContent:"center", lineHeight:1, transition:"all 0.12s" }}>{icon}</button>
+);
+// Module-scoped so input focus is preserved across modal re-renders
+const MLBL = { fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)", display:"block", marginBottom:5 };
+const Field = ({ label, children }) => (<div><label style={MLBL}>{label}</label>{children}</div>);
 
 /* ── Task row (expandable) ── */
-const TaskRow = ({ task, onStatusChange, onDelete }) => {
+const TaskRow = ({ task, onStatusChange, onDelete, onEdit }) => {
   const [open, setOpen] = useState(false);
   const s = STATUS[task.status] || STATUS.pending;
   const isDone = task.status === "done";
@@ -578,6 +584,7 @@ const TaskRow = ({ task, onStatusChange, onDelete }) => {
           )}
           <div style={{ display:"flex", gap:6, marginTop:10 }}>
             <button onClick={cycleStatus} style={{ height:26, padding:"0 10px", border:`1px solid ${STATUS[nextStatus]?.border||"var(--border)"}`, borderRadius:3, fontSize:11, fontWeight:600, color:STATUS[nextStatus]?.color||"var(--text3)", background:STATUS[nextStatus]?.bg||"var(--surface2)", cursor:"pointer", fontFamily:SANS }}>→ {STATUS[nextStatus]?.label}</button>
+            <button onClick={(e) => { e.stopPropagation(); onEdit(task); }} style={{ height:26, padding:"0 10px", border:"1px solid var(--border)", borderRadius:3, fontSize:11, fontWeight:600, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:SANS }}>Edit</button>
             <button onClick={(e) => { e.stopPropagation(); onDelete(task.id); }} style={{ height:26, padding:"0 10px", border:"1px solid rgba(200,40,30,0.25)", borderRadius:3, fontSize:11, fontWeight:600, color:"#c8281e", background:"rgba(200,40,30,0.07)", cursor:"pointer", fontFamily:SANS }}>Delete</button>
           </div>
         </div>
@@ -587,7 +594,7 @@ const TaskRow = ({ task, onStatusChange, onDelete }) => {
 };
 
 /* ── Tasks view (grouped, collapsible) ── */
-const TasksView = ({ tasks, onStatusChange, onDelete, filter, search }) => {
+const TasksView = ({ tasks, onStatusChange, onDelete, onEdit, filter, search }) => {
   const [collapsed, setCollapsed] = useState({ done:true });
   const toggle = k => setCollapsed(c => ({ ...c, [k]:!c[k] }));
 
@@ -637,7 +644,7 @@ const TasksView = ({ tasks, onStatusChange, onDelete, filter, search }) => {
               <div style={{ padding:"12px 20px", fontSize:12, color:"var(--text4)", borderBottom:"1px solid var(--line)" }}>No matching tasks in this group</div>
             )}
             {!collapsed[g.key] && rows.map(t => (
-              <TaskRow key={t.id} task={t} onStatusChange={onStatusChange} onDelete={onDelete} />
+              <TaskRow key={t.id} task={t} onStatusChange={onStatusChange} onDelete={onDelete} onEdit={onEdit} />
             ))}
           </Fragment>
         );
@@ -650,9 +657,9 @@ const TasksView = ({ tasks, onStatusChange, onDelete, filter, search }) => {
 };
 
 /* ── Projects view ── */
-const ProjectsView = ({ projects, tasks }) => (
+const ProjectsView = ({ projects, tasks, onEdit, onDelete, onAddTask }) => (
   <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
-    {projects.length === 0 && <div style={{ padding:"48px 20px", textAlign:"center", color:"var(--text4)", fontSize:13 }}>No projects yet</div>}
+    {projects.length === 0 && <div style={{ padding:"48px 20px", textAlign:"center", color:"var(--text4)", fontSize:13 }}>No projects yet — use “+ New Project” to create one</div>}
     <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:10 }}>
       {projects.map(p => {
         const pt = tasks.filter(t => t.project === p.id);
@@ -665,11 +672,15 @@ const ProjectsView = ({ projects, tasks }) => (
         const barColor = blocked > 0 ? "#f97316" : progress > 70 ? "#22c55e" : "#1c5caa";
         return (
           <div key={p.id} style={{ background:`linear-gradient(105deg,${barColor}0d 0%,var(--surface) 56%)`, border:"1px solid var(--border)", borderLeft:`5px solid ${barColor}`, borderRadius:6, padding:"14px 16px", cursor:"default", transition:"border-color 0.15s, transform 0.18s" }}>
-            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:5 }}>
-              <div style={{ fontSize:13.5, fontWeight:700, color:"var(--text)", lineHeight:1.35, paddingRight:8 }}>{p.name}</div>
-              {blocked > 0 && (
-                <span style={{ fontSize:10, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"rgba(249,115,22,0.12)", color:"#f97316", border:"1px solid rgba(249,115,22,0.25)", flexShrink:0, whiteSpace:"nowrap" }}>{blocked} blocked</span>
-              )}
+            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:5 }}>
+              <div style={{ fontSize:13.5, fontWeight:700, color:"var(--text)", lineHeight:1.35, flex:1, minWidth:0 }}>{p.name}</div>
+              <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
+                {blocked > 0 && (
+                  <span style={{ fontSize:10, fontWeight:700, padding:"2px 6px", borderRadius:3, background:"rgba(249,115,22,0.12)", color:"#f97316", border:"1px solid rgba(249,115,22,0.25)", whiteSpace:"nowrap" }}>{blocked} blocked</span>
+                )}
+                <IconBtn icon="✎" title="Edit project" onClick={() => onEdit(p)} />
+                <IconBtn icon="✕" title="Delete project" danger onClick={() => onDelete(p.id)} />
+              </div>
             </div>
             <div style={{ fontSize:11, color:"var(--text4)", marginBottom:10 }}>{p.role || p.desc || "—"}</div>
             <div style={{ height:3, background:"var(--border)", borderRadius:2, marginBottom:9, overflow:"hidden" }}>
@@ -685,6 +696,7 @@ const ProjectsView = ({ projects, tasks }) => (
                 <span style={{ fontSize:11, color:"var(--text4)", fontFamily:MONO }}>{due}</span>
               </div>
             </div>
+            <button onClick={() => onAddTask(p.id)} className="btn-ghost" style={{ marginTop:11, width:"100%", height:30, border:"1px dashed var(--border2)", borderRadius:4, background:"transparent", color:"var(--text3)", fontSize:11.5, fontWeight:600, cursor:"pointer", fontFamily:SANS, transition:"all 0.12s" }}>+ Add task</button>
           </div>
         );
       })}
@@ -693,7 +705,7 @@ const ProjectsView = ({ projects, tasks }) => (
 );
 
 /* ── Payments view ── */
-const PaymentsView = ({ payments, onToggle }) => {
+const PaymentsView = ({ payments, onToggle, onEdit, onDelete }) => {
   const statusOf = (p) => p.status === "received" ? "received" : (p.due && daysUntil(p.due) < 0 ? "overdue" : "pending");
   const sum = (pred) => payments.filter(pred).reduce((acc, p) => acc + Number(p.amount || 0), 0);
   const outstanding = sum(p => statusOf(p) !== "received");
@@ -728,6 +740,8 @@ const PaymentsView = ({ payments, onToggle }) => {
             <button onClick={() => onToggle(p.id)} style={{ height:28, padding:"0 12px", border:"none", borderRadius:3, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:SANS, flexShrink:0, background: st === "received" ? "rgba(34,197,94,0.12)" : st === "overdue" ? "rgba(200,40,30,0.1)" : "rgba(245,158,11,0.12)", color: sc }}>
               {st === "received" ? "✓ Received" : st === "overdue" ? "Overdue" : "Pending"}
             </button>
+            <IconBtn icon="✎" title="Edit payment" onClick={() => onEdit(p)} />
+            <IconBtn icon="✕" title="Delete payment" danger onClick={() => onDelete(p.id)} />
           </div>
         );
       })}
@@ -736,10 +750,10 @@ const PaymentsView = ({ payments, onToggle }) => {
 };
 
 /* ── Decisions view ── */
-const DecisionsView = ({ decisions }) => (
+const DecisionsView = ({ decisions, onEdit, onDelete }) => (
   <div className="kn-content-pad" style={{ flex:1, overflow:"auto", padding:"16px 20px" }}>
     <div style={{ maxWidth:820 }}>
-      {decisions.length === 0 && <div style={{ padding:"32px 0", color:"var(--text4)", fontSize:13 }}>No decisions logged yet</div>}
+      {decisions.length === 0 && <div style={{ padding:"32px 0", color:"var(--text4)", fontSize:13 }}>No decisions logged yet — use “+ New Decision” to log one</div>}
       {decisions.map((d, i) => {
         const parsed = new Date(d.ts);
         const valid = d.ts && !isNaN(parsed);
@@ -752,8 +766,12 @@ const DecisionsView = ({ decisions }) => (
               {timeStr && <div style={{ fontSize:10.5, fontFamily:MONO, color:"var(--text4)", marginTop:1 }}>{timeStr}</div>}
             </div>
             <div style={{ width:2, background:"var(--border)", borderRadius:2, flexShrink:0, alignSelf:"stretch", minHeight:20 }}></div>
-            <div style={{ flex:1 }}>
+            <div style={{ flex:1, minWidth:0 }}>
               <div style={{ fontSize:13.5, color:"var(--text)", lineHeight:1.7 }}>{d.note || d.text || ""}</div>
+            </div>
+            <div style={{ display:"flex", gap:6, flexShrink:0, alignItems:"flex-start", paddingTop:1 }}>
+              <IconBtn icon="✎" title="Edit decision" onClick={() => onEdit(d)} />
+              <IconBtn icon="✕" title="Delete decision" danger onClick={() => onDelete(d.id)} />
             </div>
           </div>
         );
@@ -818,56 +836,86 @@ const SettingsPanel = ({ onClose, onAddRole, onRenameRole, onDisconnect }) => {
   );
 };
 
-/* ── New task modal ── */
-const NewTaskModal = ({ onClose, onAdd, projects }) => {
-  const [f, setF] = useState({ title:"", status:"pending", role:(S.roles&&S.roles[0])||"CEO", project:(projects[0]&&projects[0].id)||"", due:"", nextAction:"", priority:"medium" });
+/* ── Generic entity modal (add / edit · task · project · payment · decision) ── */
+const ENTITY_LABEL = { task:"Task", project:"Project", payment:"Payment", decision:"Decision" };
+const EntityModal = ({ kind, item, projects, onClose, onSave, onDelete }) => {
+  const blank = {
+    task:     { title:"", status:"pending", role:(S.roles&&S.roles[0])||"CEO", project:(projects[0]&&projects[0].id)||"", due:"", nextAction:"", notes:"", priority:"medium" },
+    project:  { name:"", role:"", desc:"" },
+    payment:  { client:"", amount:"", due:"", status:"pending", notes:"" },
+    decision: { note:"", date:today() },
+  }[kind];
+  const start = { ...blank, ...(item||{}) };
+  if (kind === "decision" && item && item.ts) start.date = String(item.ts).slice(0,10);
+  const [f, setF] = useState(start);
   const set = (k, v) => setF(x => ({ ...x, [k]:v }));
+  const isEdit = !!(item && item.id);
+
   const inp = { width:"100%", background:"var(--surface2)", border:"1px solid var(--border)", borderRadius:4, color:"var(--text)", fontFamily:SANS, fontSize:13, padding:"9px 12px", outline:"none", boxSizing:"border-box", transition:"border-color 0.15s" };
-  const lbl = { fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text4)", display:"block", marginBottom:5 };
+  const sel = { ...inp, appearance:"none", cursor:"pointer" };
+  const area = { ...inp, minHeight:64, resize:"vertical", lineHeight:1.5 };
+
+  const valid =
+    kind === "task"    ? (String(f.title).trim() && f.project) :
+    kind === "project" ? String(f.name).trim() :
+    kind === "payment" ? (String(f.client).trim() && String(f.amount).trim() !== "") :
+                         String(f.note).trim();
+
   return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.65)", backdropFilter:"blur(10px)", zIndex:300, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.65)", backdropFilter:"blur(10px)", zIndex:300, display:"flex", alignItems:"center", justifyContent:"center", padding:20, overflow:"auto" }}>
       <div style={{ background:"var(--surface)", border:"1px solid var(--border2)", borderTop:"2px solid var(--accent)", borderRadius:10, padding:24, width:"100%", maxWidth:460, boxShadow:"0 24px 80px rgba(0,0,0,0.55)", animation:"scaleIn 0.24s cubic-bezier(0.34,1.56,0.64,1) both" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
-          <span style={{ fontSize:16, fontWeight:800, color:"var(--text)", letterSpacing:"-0.02em" }}>New Task</span>
+          <span style={{ fontSize:16, fontWeight:800, color:"var(--text)", letterSpacing:"-0.02em" }}>{isEdit ? "Edit " : "New "}{ENTITY_LABEL[kind]}</span>
           <button onClick={onClose} style={{ background:"none", border:"none", color:"var(--text3)", cursor:"pointer", fontSize:18, fontFamily:SANS, lineHeight:1 }}>✕</button>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:13 }}>
-          <div>
-            <label style={lbl}>Title</label>
-            <input value={f.title} onChange={e => set("title", e.target.value)} placeholder="Task title…" style={inp} autoFocus />
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-            <div>
-              <label style={lbl}>Status</label>
-              <select value={f.status} onChange={e => set("status", e.target.value)} style={{ ...inp, appearance:"none", cursor:"pointer" }}>
-                {Object.entries(STATUS).map(([k,v]) => <option key={k} value={k}>{v.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={lbl}>Role</label>
-              <select value={f.role} onChange={e => set("role", e.target.value)} style={{ ...inp, appearance:"none", cursor:"pointer" }}>
-                {(S.roles||[]).map(r => <option key={r}>{r}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={lbl}>Project</label>
-              <select value={f.project} onChange={e => set("project", e.target.value)} style={{ ...inp, appearance:"none", cursor:"pointer" }}>
-                <option value="">— none —</option>
-                {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={lbl}>Due date</label>
-              <input type="date" value={f.due} onChange={e => set("due", e.target.value)} style={inp} />
-            </div>
-          </div>
-          <div>
-            <label style={lbl}>Next action</label>
-            <input value={f.nextAction} onChange={e => set("nextAction", e.target.value)} placeholder="What's the immediate next step?" style={inp} />
-          </div>
-          <div style={{ display:"flex", gap:8, justifyContent:"flex-end", marginTop:4 }}>
+
+          {kind === "task" && (
+            <Fragment>
+              <Field label="Title"><input value={f.title} onChange={e => set("title", e.target.value)} placeholder="Task title…" style={inp} autoFocus /></Field>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                <Field label="Status"><select value={f.status} onChange={e => set("status", e.target.value)} style={sel}>{Object.entries(STATUS).map(([k,v]) => <option key={k} value={k}>{v.label}</option>)}</select></Field>
+                <Field label="Role"><select value={f.role} onChange={e => set("role", e.target.value)} style={sel}>{(S.roles||[]).map(r => <option key={r}>{r}</option>)}</select></Field>
+                <Field label="Project"><select value={f.project} onChange={e => set("project", e.target.value)} style={sel}>{projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
+                <Field label="Due date"><input type="date" value={f.due} onChange={e => set("due", e.target.value)} style={inp} /></Field>
+              </div>
+              <Field label="Next action"><input value={f.nextAction} onChange={e => set("nextAction", e.target.value)} placeholder="What's the immediate next step?" style={inp} /></Field>
+              <Field label="Notes"><textarea value={f.notes} onChange={e => set("notes", e.target.value)} placeholder="Optional notes…" style={area} /></Field>
+            </Fragment>
+          )}
+
+          {kind === "project" && (
+            <Fragment>
+              <Field label="Name"><input value={f.name} onChange={e => set("name", e.target.value)} placeholder="Project name…" style={inp} autoFocus /></Field>
+              <Field label="Owner role"><select value={f.role} onChange={e => set("role", e.target.value)} style={sel}><option value="">— none —</option>{(S.roles||[]).map(r => <option key={r}>{r}</option>)}</select></Field>
+              <Field label="Description"><textarea value={f.desc} onChange={e => set("desc", e.target.value)} placeholder="Optional description…" style={area} /></Field>
+            </Fragment>
+          )}
+
+          {kind === "payment" && (
+            <Fragment>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                <Field label="Client"><input value={f.client} onChange={e => set("client", e.target.value)} placeholder="Client name…" style={inp} autoFocus /></Field>
+                <Field label="Amount (£)"><input type="number" inputMode="decimal" value={f.amount} onChange={e => set("amount", e.target.value)} placeholder="0" style={inp} /></Field>
+                <Field label="Status"><select value={f.status} onChange={e => set("status", e.target.value)} style={sel}><option value="pending">Pending</option><option value="received">Received</option></select></Field>
+                <Field label="Due date"><input type="date" value={f.due} onChange={e => set("due", e.target.value)} style={inp} /></Field>
+              </div>
+              <Field label="Notes"><input value={f.notes} onChange={e => set("notes", e.target.value)} placeholder="Optional notes…" style={inp} /></Field>
+            </Fragment>
+          )}
+
+          {kind === "decision" && (
+            <Fragment>
+              <Field label="Decision"><textarea value={f.note} onChange={e => set("note", e.target.value)} placeholder="What was decided?" style={{ ...area, minHeight:90 }} autoFocus /></Field>
+              <Field label="Date"><input type="date" value={f.date} onChange={e => set("date", e.target.value)} style={inp} /></Field>
+            </Fragment>
+          )}
+
+          <div style={{ display:"flex", gap:8, alignItems:"center", marginTop:4 }}>
+            {isEdit && <button onClick={() => onDelete(item.id)} style={{ height:36, padding:"0 14px", border:"1px solid rgba(200,40,30,0.25)", borderRadius:5, fontSize:13, fontWeight:600, color:"#c8281e", background:"rgba(200,40,30,0.07)", cursor:"pointer", fontFamily:SANS }}>Delete</button>}
+            <div style={{ flex:1 }} />
             <button onClick={onClose} style={{ height:36, padding:"0 16px", border:"1px solid var(--border)", borderRadius:5, fontSize:13, fontWeight:600, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:SANS }}>Cancel</button>
-            <button onClick={() => { if (f.title.trim()) { onAdd(f); onClose(); } }} style={{ height:36, padding:"0 18px", border:"none", borderRadius:5, fontSize:13, fontWeight:700, color:"#fff", background:"var(--accent)", cursor:"pointer", fontFamily:SANS, opacity:f.title.trim() ? 1 : 0.4 }}>Add Task</button>
+            <button onClick={() => { if (valid) onSave({ ...f, id:item && item.id }); }} style={{ height:36, padding:"0 18px", border:"none", borderRadius:5, fontSize:13, fontWeight:700, color:"#fff", background:"var(--accent)", cursor:valid?"pointer":"not-allowed", fontFamily:SANS, opacity:valid ? 1 : 0.4 }}>{isEdit ? "Save" : "Add"}</button>
           </div>
         </div>
       </div>
@@ -882,7 +930,7 @@ const App = () => {
   const [dark, setDark] = useState(document.documentElement.getAttribute("data-theme") !== "light");
   const [tab, setTab] = useState("tasks");
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [newTaskOpen, setNewTaskOpen] = useState(false);
+  const [modal, setModal] = useState(null); // { kind:'task'|'project'|'payment'|'decision', item? }
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [toastMsg, setToastMsg] = useState(null);
@@ -918,9 +966,9 @@ const App = () => {
         return;
       }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); manualSave(); showToast("Saved"); }
-      else if (e.key === "n" && !e.metaKey && !e.ctrlKey) { setNewTaskOpen(true); }
+      else if (e.key === "n" && !e.metaKey && !e.ctrlKey) { if (!(S.projects||[]).length) { showToast("Create a project first"); setModal({ kind:"project" }); } else { setModal({ kind:"task" }); } }
       else if (e.key === "/") { e.preventDefault(); const el = document.getElementById("kn-search"); if (el) el.focus(); }
-      else if (e.key === "Escape") { setSettingsOpen(false); setNewTaskOpen(false); }
+      else if (e.key === "Escape") { setSettingsOpen(false); setModal(null); }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -928,11 +976,51 @@ const App = () => {
 
   // Mutations
   const onStatusChange = (id, next) => { S.tasks = S.tasks.map(t => t.id === id ? { ...t, status:next } : t); commit(); showToast(`→ ${STATUS[next]?.label}`); };
-  const onDeleteTask = (id) => { S.tasks = S.tasks.filter(t => t.id !== id); commit(); showToast("Task deleted"); };
-  const onAddTask = (form) => {
-    S.tasks = [{ id:uid(), title:form.title.trim(), role:form.role, project:form.project, priority:form.priority, status:form.status, due:form.due, nextAction:form.nextAction, notes:"", created:new Date().toISOString() }, ...S.tasks];
-    commit(); showToast("Task added");
+  const onDeleteTask = (id) => { if (!window.confirm("Delete this task?")) return; S.tasks = S.tasks.filter(t => t.id !== id); commit(); showToast("Task deleted"); };
+
+  // Save (add or edit) for every entity
+  const saveTask = (f) => {
+    if (f.id) { S.tasks = S.tasks.map(t => t.id === f.id ? { ...t, title:f.title.trim(), status:f.status, role:f.role, project:f.project, due:f.due, nextAction:f.nextAction, notes:f.notes||"" } : t); showToast("Task updated"); }
+    else { S.tasks = [{ id:uid(), title:f.title.trim(), role:f.role, project:f.project, priority:f.priority||"medium", status:f.status, due:f.due, nextAction:f.nextAction, notes:f.notes||"", created:new Date().toISOString() }, ...S.tasks]; showToast("Task added"); }
+    commit();
   };
+  const saveProject = (f) => {
+    if (f.id) { S.projects = S.projects.map(p => p.id === f.id ? { ...p, name:f.name.trim(), role:f.role, desc:f.desc } : p); showToast("Project updated"); }
+    else { S.projects = [{ id:uid(), name:f.name.trim(), role:f.role, desc:f.desc }, ...S.projects]; showToast("Project added"); }
+    commit();
+  };
+  const deleteProject = (id) => {
+    const n = (S.tasks||[]).filter(t => t.project === id).length;
+    if (!window.confirm(`Delete this project${n ? ` and its ${n} task(s)` : ""}?`)) return;
+    S.projects = (S.projects||[]).filter(p => p.id !== id);
+    S.tasks = (S.tasks||[]).filter(t => t.project !== id);
+    commit(); showToast("Project deleted");
+  };
+  const savePayment = (f) => {
+    if (f.id) { S.payments = S.payments.map(p => p.id === f.id ? { ...p, client:f.client.trim(), amount:f.amount, due:f.due, status:f.status, notes:f.notes } : p); showToast("Payment updated"); }
+    else { S.payments = [{ id:uid(), client:f.client.trim(), amount:f.amount, due:f.due, status:f.status||"pending", notes:f.notes }, ...(S.payments||[])]; showToast("Payment added"); }
+    commit();
+  };
+  const deletePayment = (id) => { if (!window.confirm("Delete this payment?")) return; S.payments = (S.payments||[]).filter(p => p.id !== id); commit(); showToast("Payment deleted"); };
+  const saveDecision = (f) => {
+    const ts = f.date ? new Date(f.date).toISOString() : (f.ts || new Date().toISOString());
+    if (f.id) { S.decisions = S.decisions.map(d => d.id === f.id ? { ...d, note:f.note.trim(), ts } : d); showToast("Decision updated"); }
+    else { S.decisions = [{ id:uid(), ts, note:f.note.trim() }, ...(S.decisions||[])]; showToast("Decision logged"); }
+    commit();
+  };
+  const deleteDecision = (id) => { if (!window.confirm("Delete this decision?")) return; S.decisions = (S.decisions||[]).filter(d => d.id !== id); commit(); showToast("Decision deleted"); };
+
+  const saveEntity = (kind, f) => ({ task:saveTask, project:saveProject, payment:savePayment, decision:saveDecision }[kind])(f);
+  const deleteEntity = (kind, id) => ({ task:onDeleteTask, project:deleteProject, payment:deletePayment, decision:deleteDecision }[kind])(id);
+
+  // Open the right "new" modal for the active tab (tasks must live inside a project)
+  const startNew = () => {
+    if (tab === "tasks") {
+      if (!(S.projects||[]).length) { showToast("Create a project first"); setModal({ kind:"project" }); return; }
+      setModal({ kind:"task" });
+    } else { setModal({ kind: tab.slice(0, -1) }); }
+  };
+
   const onTogglePayment = (id) => { S.payments = S.payments.map(p => p.id === id ? { ...p, status: p.status === "received" ? "pending" : "received" } : p); commit(); };
   const onAddRole = () => {
     const name = (window.prompt("New role name (e.g. CTO):") || "").trim();
@@ -1006,7 +1094,7 @@ const App = () => {
           ))}
         </div>
         <div style={{ display:"flex", gap:6, alignItems:"center", flexShrink:0 }}>
-          <button className="kn-newtask" onClick={() => setNewTaskOpen(true)} style={{ height:34, padding:"0 15px", border:"none", borderRadius:5, fontSize:12.5, fontWeight:700, background:"var(--accent)", color:"#fff", cursor:"pointer", fontFamily:SANS, letterSpacing:"0.01em", transition:"background 0.15s", whiteSpace:"nowrap" }}>+ New Task</button>
+          <button className="kn-newtask" onClick={startNew} style={{ height:34, padding:"0 15px", border:"none", borderRadius:5, fontSize:12.5, fontWeight:700, background:"var(--accent)", color:"#fff", cursor:"pointer", fontFamily:SANS, letterSpacing:"0.01em", transition:"background 0.15s", whiteSpace:"nowrap" }}>+ New {ENTITY_LABEL[tab.slice(0,-1)]}</button>
           <button className="kn-save-btn" onClick={() => { manualSave(); showToast("Saved"); }} style={{ height:34, padding:"0 12px", border:"1px solid var(--border)", borderRadius:5, fontSize:12, fontWeight:500, color:"var(--text3)", background:"transparent", cursor:"pointer", fontFamily:MONO, transition:"all 0.12s" }}>⌘S</button>
           <button onClick={() => setSettingsOpen(o => !o)} style={{ width:34, height:34, borderRadius:5, border:`1px solid ${settingsOpen ? "var(--accent)" : "var(--border)"}`, background: settingsOpen ? "rgba(28,92,170,0.12)" : "transparent", color: settingsOpen ? "var(--accent-hover)" : "var(--text3)", cursor:"pointer", fontSize:15, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:SANS, transition:"all 0.15s" }}>⚙</button>
           <button onClick={() => setDark(d => !d)} title={dark ? "Switch to light" : "Switch to dark"} style={{ width:30, height:30, borderRadius:"50%", border:"1.5px solid var(--border)", background:"transparent", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"border-color 0.18s", flexShrink:0 }}>
@@ -1042,10 +1130,10 @@ const App = () => {
 
       {/* MAIN CONTENT */}
       <div style={{ flex:1, overflow:"hidden", display:"flex", flexDirection:"column", minHeight:0, background:"var(--bg)" }}>
-        {tab === "tasks"     && <TasksView tasks={tasks} onStatusChange={onStatusChange} onDelete={onDeleteTask} filter={filter} search={search} />}
-        {tab === "projects"  && <ProjectsView projects={S.projects||[]} tasks={tasks} />}
-        {tab === "payments"  && <PaymentsView payments={S.payments||[]} onToggle={onTogglePayment} />}
-        {tab === "decisions" && <DecisionsView decisions={S.decisions||[]} />}
+        {tab === "tasks"     && <TasksView tasks={tasks} onStatusChange={onStatusChange} onDelete={onDeleteTask} onEdit={t => setModal({ kind:"task", item:t })} filter={filter} search={search} />}
+        {tab === "projects"  && <ProjectsView projects={S.projects||[]} tasks={tasks} onEdit={p => setModal({ kind:"project", item:p })} onDelete={deleteProject} onAddTask={pid => setModal({ kind:"task", item:{ project:pid } })} />}
+        {tab === "payments"  && <PaymentsView payments={S.payments||[]} onToggle={onTogglePayment} onEdit={p => setModal({ kind:"payment", item:p })} onDelete={deletePayment} />}
+        {tab === "decisions" && <DecisionsView decisions={S.decisions||[]} onEdit={d => setModal({ kind:"decision", item:d })} onDelete={deleteDecision} />}
       </div>
 
       {/* FOOTER HINTS */}
@@ -1059,7 +1147,7 @@ const App = () => {
       </div>
 
       {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} onAddRole={onAddRole} onRenameRole={onRenameRole} onDisconnect={onDisconnect} />}
-      {newTaskOpen && <NewTaskModal onClose={() => setNewTaskOpen(false)} onAdd={onAddTask} projects={S.projects||[]} />}
+      {modal && <EntityModal kind={modal.kind} item={modal.item} projects={S.projects||[]} onClose={() => setModal(null)} onSave={f => { saveEntity(modal.kind, f); setModal(null); }} onDelete={id => { deleteEntity(modal.kind, id); setModal(null); }} />}
 
       {toastMsg && (
         <div style={{ position:"fixed", bottom:44, right:20, background:"var(--surface2)", border:"1px solid var(--border2)", borderRadius:7, padding:"9px 16px", fontSize:13, fontWeight:600, color:"var(--text)", zIndex:400, boxShadow:"0 8px 30px rgba(0,0,0,0.3)", animation:"fadeSlide 0.28s cubic-bezier(0.34,1.56,0.64,1) both", pointerEvents:"none" }}>{toastMsg}</div>
