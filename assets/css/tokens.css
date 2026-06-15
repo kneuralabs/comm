@@ -1,0 +1,115 @@
+/* ════════════════════════════════════════════════════════════════
+   TOKENS — design system primitives
+   One type scale · appearance-aware color · materials · motion
+   ════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Surfaces & lines (light) ── */
+  --bg:           #eef1f6;
+  --surface:      #ffffff;
+  --surface2:     #f1f3f8;
+  --surface3:     #e6e9f0;
+  --border:       #e2e5ee;
+  --border2:      #cfd4e0;
+  --line:         #edeff5;
+  --hairline:     rgba(16,24,40,0.08);
+
+  /* ── Text (tuned for WCAG AA on --surface) ── */
+  --text:         #14161c;
+  --text2:        #3a3d47;   /* ~9:1  */
+  --text3:        #585c68;   /* ~6:1  body-secondary, safe for info */
+  --text4:        #8a8f9c;   /* decorative only */
+
+  /* ── Brand & semantics (vivid, Apple-system-blue family) ── */
+  --accent:       #0a6cff;
+  --accent-hover: #2f86ff;
+  --accent-ink:   #ffffff;
+  --red:          #e11d2e;
+  --green:        #12a150;
+  --orange:       #ef7c12;
+
+  /* ── Status (semantic, appearance-aware) ── */
+  --st-progress:    #1f74d6;  --st-progress-bg: rgba(31,116,214,0.10);  --st-progress-bd: rgba(31,116,214,0.30);
+  --st-blocked:     #ef7c12;  --st-blocked-bg:  rgba(239,124,18,0.11);  --st-blocked-bd:  rgba(239,124,18,0.30);
+  --st-pending:     #6b7686;  --st-pending-bg:  rgba(107,118,134,0.10); --st-pending-bd:  rgba(107,118,134,0.26);
+  --st-done:        #12a150;  --st-done-bg:     rgba(18,161,80,0.10);   --st-done-bd:     rgba(18,161,80,0.28);
+
+  /* ── Materials ── */
+  --glass-bg:     rgba(255,255,255,0.66);
+  --glass:        saturate(180%) blur(22px);
+
+  /* ── Living-Surface ambiance (mood is set by JS from operational health) ── */
+  --mood-h:       212;   /* hue   — calm blue ⇄ warm red as health degrades */
+  --mood-s:       82%;   /* sat   */
+  --mood-e:       0.10;  /* energy — drives aurora opacity / motion */
+  --focus:        hsl(var(--mood-h) 90% 52%);
+
+  /* ── Type scale (named, finite — no more half-pixel sprawl) ── */
+  --fs-overline: 10px;   /* uppercase labels */
+  --fs-2xs:      11px;
+  --fs-xs:       12px;
+  --fs-sm:       13px;
+  --fs-md:       14px;
+  --fs-base:     15px;
+  --fs-lg:       17px;
+  --fs-xl:       21px;
+  --fs-2xl:      28px;
+  --fs-3xl:      34px;
+  --tracking-label: 0.12em;
+
+  /* ── Radii (continuous corners) ── */
+  --r-xs: 8px;  --r-sm: 11px;  --r-md: 14px;  --r-lg: 18px;  --r-xl: 24px;  --r-pill: 999px;
+
+  /* ── Elevation ── */
+  --sh-1: 0 1px 2px rgba(20,30,50,0.05), 0 1px 3px rgba(20,30,50,0.06);
+  --sh-2: 0 8px 24px rgba(20,30,50,0.09), 0 2px 6px rgba(20,30,50,0.06);
+  --sh-3: 0 30px 80px rgba(15,25,45,0.24), 0 8px 22px rgba(15,25,45,0.14);
+  --glow: 0 0 0 1px hsl(var(--mood-h) 80% 60% / 0.20), 0 10px 40px hsl(var(--mood-h) 80% 50% / 0.18);
+
+  /* ── Motion ── */
+  --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
+  --ease-smooth: cubic-bezier(0.22,1,0.36,1);
+  --ease-out:    cubic-bezier(0.16,1,0.3,1);
+
+  /* ── Type families ── */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, 'Courier New', monospace;
+}
+
+[data-theme="dark"] {
+  --bg:           #060912;
+  --surface:      #0d1726;
+  --surface2:     #122236;
+  --surface3:     #1a3050;
+  --border:       #1f3a5c;
+  --border2:      #2a4d76;
+  --line:         #142539;
+  --hairline:     rgba(255,255,255,0.07);
+
+  --text:         #f2f5fa;
+  --text2:        #c3cfe0;
+  --text3:        #93a6c2;   /* raised from old #6a83a0 for AA */
+  --text4:        #647a99;
+
+  --accent:       #3a8dff;
+  --accent-hover: #67a8ff;
+  --accent-ink:   #ffffff;
+  --red:          #ff5d54;
+  --green:        #2ecd6f;
+  --orange:       #ff9d3f;
+
+  --st-progress:    #5aa2e6;  --st-progress-bg: rgba(90,162,230,0.14);  --st-progress-bd: rgba(90,162,230,0.34);
+  --st-blocked:     #ff9d3f;  --st-blocked-bg:  rgba(255,157,63,0.14);  --st-blocked-bd:  rgba(255,157,63,0.34);
+  --st-pending:     #8298b4;  --st-pending-bg:  rgba(130,152,180,0.13); --st-pending-bd:  rgba(130,152,180,0.30);
+  --st-done:        #2ecd6f;  --st-done-bg:     rgba(46,205,111,0.14);  --st-done-bd:     rgba(46,205,111,0.32);
+
+  --glass-bg:     rgba(10,21,36,0.58);
+  --glass:        saturate(180%) blur(24px);
+
+  --mood-e:       0.18;
+
+  --sh-1: 0 1px 2px rgba(0,0,0,0.30), 0 1px 3px rgba(0,0,0,0.34);
+  --sh-2: 0 10px 30px rgba(0,0,0,0.46), 0 2px 8px rgba(0,0,0,0.34);
+  --sh-3: 0 34px 90px rgba(0,0,0,0.62), 0 10px 28px rgba(0,0,0,0.48);
+  --glow: 0 0 0 1px hsl(var(--mood-h) 80% 62% / 0.30), 0 12px 50px hsl(var(--mood-h) 85% 55% / 0.30);
+}

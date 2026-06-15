@@ -1,0 +1,107 @@
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — desktop · laptop · tablet · phone · ultrawide · landscape
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Touch devices: enforce the 44pt minimum target ── */
+@media (hover: none) and (pointer: coarse) {
+  .kn-hit { min-width: 44px !important; min-height: 44px !important; }
+}
+
+/* ── Large desktop: a touch more air ── */
+@media (min-width: 1440px) {
+  .kn-header  { padding: 0 44px !important; }
+  .kn-nav     { padding: 0 44px !important; }
+  .kn-footer  { padding: 0 44px !important; }
+  .kn-metrics { gap: 34px !important; }
+}
+
+/* ── Small laptop / large tablet landscape ── */
+@media (max-width: 1120px) { .kn-metrics { gap: 22px !important; } }
+
+/* ── Tablet / phone ── */
+@media (max-width: 860px) {
+  .kn-header   { padding: 0 16px !important; gap: 14px !important; }
+  .kn-divider  { display: none !important; }
+  .kn-metrics  { gap: 20px !important; flex: 1; overflow-x: auto; padding: 0 2px; -webkit-overflow-scrolling: touch; }
+  .kn-metrics > div { flex-shrink: 0; }
+  .kn-save-btn { display: none !important; }
+  .kn-nav      { padding: 0 16px !important; overflow-x: auto; }
+  .kn-controls { margin-left: 10px !important; }
+  .kn-content-pad { padding-left: 16px !important; padding-right: 16px !important; }
+  .kn-footer   { padding: 0 16px !important; }
+  .kn-footer-keys { display: none !important; }
+  .kn-col-role, .kn-col-project { display: none !important; }
+  .kn-row-meta { display: flex !important; }
+  .kn-pay-tiles { grid-template-columns: 1fr 1fr !important; }
+  .kn-pay-tiles > div:last-child { grid-column: 1 / -1; }
+  .kn-pay-tiles > div .kn-pay-val { font-size: var(--fs-xl) !important; }
+}
+
+/* ── Phone: bottom tab bar, FAB, big targets, safe areas ── */
+@media (max-width: 640px) {
+  .kn-header   { height: 56px !important; padding: 0 16px !important; padding-top: env(safe-area-inset-top) !important; }
+  .kn-newtask  { display: none !important; }
+  .kn-tabs     { display: none !important; }
+  .kn-nav      { height: auto !important; min-height: 48px; padding: 7px 14px !important; }
+  .kn-nav-empty { display: none !important; }
+  .kn-footer   { display: none !important; }
+  .kn-content-pad { padding: 14px 16px 22px !important; }
+
+  .kn-tasks-thead { display: none !important; }
+  .kn-tasks-scroll { padding-bottom: 84px !important; }
+  .kn-task-card {
+    margin: 9px 13px; border: 1px solid var(--border); border-radius: var(--r-lg);
+    overflow: hidden; background: var(--surface); box-shadow: var(--sh-1);
+    animation: fadeSlide 0.3s var(--ease-smooth) both;
+  }
+  .kn-task-card .kn-task-row { height: 64px !important; border-bottom: none !important; padding-right: 14px; }
+  .kn-col-status { width: auto !important; padding-left: 6px; }
+  .kn-col-due    { display: none !important; }
+  .kn-status-badge { font-size: var(--fs-xs) !important; padding: 6px 12px !important; }
+
+  .kn-controls { width: 100%; margin-left: 0 !important; gap: 9px !important; }
+  .kn-searchwrap { flex: 1 !important; }
+  .kn-searchwrap .kn-search { flex: 1 !important; width: auto !important; }
+
+  .kn-bottom-nav {
+    display: flex; flex-shrink: 0; align-items: stretch; justify-content: space-around;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background: var(--glass-bg); backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
+    position: relative; z-index: 50;
+  }
+  .kn-fab {
+    display: flex; position: fixed; right: 18px;
+    bottom: calc(74px + env(safe-area-inset-bottom)); z-index: 120;
+  }
+  .kn-toast {
+    left: 16px; right: 16px; bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+    text-align: center;
+  }
+  .kn-palette { top: 12vh !important; }
+}
+
+/* ── Narrow phones ── */
+@media (max-width: 400px) {
+  .kn-metrics { gap: 16px !important; }
+  .kn-bottom-tab-label { font-size: var(--fs-overline) !important; }
+}
+
+/* ── Ultra-wide: center content, cap sprawl ── */
+@media (min-width: 1700px) {
+  .kn-header, .kn-nav, .kn-footer, .kn-content-pad, .kn-tasks-scroll {
+    padding-left:  calc((100vw - 1600px) / 2) !important;
+    padding-right: calc((100vw - 1600px) / 2) !important;
+  }
+  .kn-content-pad { padding-top: 28px !important; padding-bottom: 28px !important; }
+}
+
+/* ── Landscape phones / short viewports ── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .kn-header  { height: 48px !important; padding-top: env(safe-area-inset-top) !important; }
+  .kn-nav     { min-height: 38px !important; height: 38px !important; }
+  .kn-footer  { display: none !important; }
+  .kn-bottom-nav { padding: 3px 6px calc(3px + env(safe-area-inset-bottom)) !important; }
+  .kn-fab     { width: 48px !important; height: 48px !important; bottom: calc(60px + env(safe-area-inset-bottom)) !important; }
+  .kn-tasks-scroll { padding-bottom: 68px !important; }
+}
