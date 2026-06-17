@@ -68,7 +68,7 @@ const App = () => {
   const onDeleteTask = async (id) => { if (!(await askConfirm({ title:"Delete task?", message:"This task will be permanently removed.", danger:true }))) return; S.tasks = S.tasks.filter(t => t.id !== id); commit(); showToast("Task deleted"); };
 
   const saveTask = (f) => {
-    if (f.id) { S.tasks = S.tasks.map(t => t.id === f.id ? { ...t, title:f.title.trim(), status:f.status, role:f.role, project:f.project, due:f.due, nextAction:f.nextAction, notes:f.notes||"" } : t); showToast("Task updated"); }
+    if (f.id) { S.tasks = S.tasks.map(t => t.id === f.id ? { ...t, title:f.title.trim(), status:f.status, role:f.role, project:f.project, priority:f.priority||"medium", due:f.due, nextAction:f.nextAction, notes:f.notes||"" } : t); showToast("Task updated"); }
     else { S.tasks = [{ id:uid(), title:f.title.trim(), role:f.role, project:f.project, priority:f.priority||"medium", status:f.status, due:f.due, nextAction:f.nextAction, notes:f.notes||"", created:new Date().toISOString() }, ...S.tasks]; showToast("Task added"); }
     commit();
   };
