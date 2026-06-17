@@ -105,6 +105,7 @@ const EntityModal = ({ kind, item, projects, onClose, onSave, onDelete }) => {
               <_Field label="Title"><input value={f.title} onChange={e => set("title", e.target.value)} placeholder="Task title…" style={inp} autoFocus /></_Field>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
                 <_Field label="Status"><select value={f.status} onChange={e => set("status", e.target.value)} style={sel}>{Object.entries(_STATUS).map(([k,v]) => <option key={k} value={k}>{v.label}</option>)}</select></_Field>
+                <_Field label="Priority"><select value={f.priority} onChange={e => set("priority", e.target.value)} style={sel}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></_Field>
                 <_Field label="Role"><select value={f.role} onChange={e => set("role", e.target.value)} style={sel}>{(S.roles||[]).map(r => <option key={r}>{r}</option>)}</select></_Field>
                 <_Field label="Project"><select value={f.project} onChange={e => set("project", e.target.value)} style={sel}>{projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></_Field>
                 <_Field label="Due date"><input type="date" value={f.due} onChange={e => set("due", e.target.value)} style={inp} /></_Field>
